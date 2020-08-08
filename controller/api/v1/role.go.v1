@@ -1,0 +1,104 @@
+package v1
+
+import (
+	"Etpmls-Admin1-Server/controller/api/common"
+	"Etpmls-Admin1-Server/database"
+	"Etpmls-Admin1-Server/library"
+	"Etpmls-Admin1-Server/model"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func RoleGetAll(c *gin.Context)  {
+	j := model.RoleGetAllV1()
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, nil, j)
+	return
+}
+
+func RoleCreate(c *gin.Context)  {
+	var j model.JsonRoleCreateV1
+
+	// Bind data
+	if c.ShouldBindJSON(&j) != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "提交信息不完整！", nil)
+		return
+	}
+
+	// Validate Form
+	err := library.ValidateZh(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusForbidden, 0, err.Error(), nil)
+		return
+	}
+
+	// Validate Name Unique
+	var count int
+	database.DB.Model(&model.Role{}).Where("name = ?", j.Name).Count(&count)
+	if count > 0 {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "当前角色Key已存在！", nil)
+		return
+	}
+
+	id, err := model.RoleCreateV1(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "创建失败！", nil)
+		return
+	}
+
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, nil, gin.H{"key" : id})
+	return
+}
+
+func RoleEdit(c *gin.Context)  {
+	var j model.JsonRoleEditV1
+
+	// Bind data
+	if c.ShouldBindJSON(&j) != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "提交信息不完整！", nil)
+		return
+	}
+
+	// Validate Form
+	err := library.ValidateZh(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusForbidden, 0, err.Error(), nil)
+		return
+	}
+
+	// Validate Name Unique
+	var count int
+	database.DB.Model(&model.Role{}).Where("name = ?", j.Name).Where("id != ?", j.ID).Count(&count)
+	if count > 0 {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "当前角色Key已存在！", nil)
+		return
+	}
+
+	err = model.RoleEditV1(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "更新角色失败！", nil)
+		return
+	}
+
+	// Return Message
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, nil, gin.H{"status": "success"})
+	return
+}
+
+func RoleDelete(c *gin.Context)  {
+	//Bind Data
+	var u model.UriRoleDeleteV1
+	if c.ShouldBindUri(&u) != nil{
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "提交参数不完整！", nil)
+		return
+	}
+
+	err := model.RoleDeleteV1(u)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "删除失败！", nil)
+		return
+	}
+
+	// Return Message
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, nil, gin.H{"status": "success"})
+	return
+}

@@ -1,0 +1,37 @@
+app:
+  port: 8080
+  captcha: true
+  register: false
+  key:
+  log:
+    level: info
+    panic: 3
+    fatal: 3
+    error: 3
+    warning: 3
+    info: 3
+    debug: 3
+    trace: 3
+  api:
+    use_http_code: true
+    field:
+      code: code
+      message: msg
+      status: status
+      data: data
+    pagination:
+      field:
+        page_no: pageNo
+        page_size: pageSize
+        count: count
+database:
+  host: localhost
+  port: 5432
+  name: Etpmls-Admin
+  user: postgres
+  password: postgres
+  prefix: etp_
+redis:
+  address: localhost:6379
+  password:
+  db: 0

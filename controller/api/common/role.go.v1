@@ -1,0 +1,15 @@
+package common
+
+import (
+	"Etpmls-Admin1-Server/database"
+	"Etpmls-Admin1-Server/model"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func RoleGetAll(c *gin.Context)  {
+	var role []model.Role
+	database.DB.Find(&role)
+	ReturnJsonSuccess(c, http.StatusOK, 20000, nil , role)
+	return
+}

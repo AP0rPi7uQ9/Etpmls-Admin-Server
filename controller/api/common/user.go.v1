@@ -1,0 +1,15 @@
+package common
+
+import (
+	"Etpmls-Admin1-Server/database"
+	"Etpmls-Admin1-Server/model"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func UserGetAll(c *gin.Context)  {
+	var user []model.User
+	database.DB.Find(&user)
+	ReturnJsonSuccess(c, http.StatusOK, 20000, nil , user)
+	return
+}

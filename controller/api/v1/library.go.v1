@@ -1,0 +1,14 @@
+package v1
+
+import (
+	"Etpmls-Admin1-Server/controller/api/common"
+	"Etpmls-Admin1-Server/library"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func LibraryCaptchaGetOne(c *gin.Context)  {
+	captchaId := library.CaptchaGenerateId()
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "获取成功！", captchaId)
+	return
+}

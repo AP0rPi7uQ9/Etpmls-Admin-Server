@@ -1,0 +1,65 @@
+package library
+//https://www.jianshu.com/p/0c60f665d5d7
+//https://godoc.org/github.com/dgrijalva/jwt-go#NewWithClaims
+
+import (
+	"errors"
+	"github.com/dgrijalva/jwt-go"
+)
+
+var (
+	TokenExpired     = errors.New("Token is expired")
+	TokenNotValidYet = errors.New("Token not active yet")
+	TokenMalformed   = errors.New("That's not even a token")
+	TokenInvalid     = errors.New("不能处理这个Token")
+
+	J = Jwt{
+		SigningKey: []byte("r.o@9s#<8^6}H!ujCalU6R8r7wP/,t^v/<]}`7iL`tZ}2#^*qh"),
+	}
+)
+
+type Jwt struct {
+	SigningKey []byte
+}
+
+type MyCustomClaims struct {
+	ID uint
+	jwt.StandardClaims
+}
+
+
+
+
+func (j Jwt) CreateToken(claims MyCustomClaims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(j.SigningKey)
+}
+
+func (j Jwt) ParseToken(tokenString string) (c *MyCustomClaims, err error) {
+	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (i interface{}, e error) {
+		return j.SigningKey, nil
+	})
+	if err != nil {
+		return c, err
+	}
+
+	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
+		return claims, err
+	} else {
+		return c, TokenInvalid
+	}
+}
+
+
+
+
+
+func GetClaimsByToken(token string) (claims *MyCustomClaims, err error) {
+	claims, err = J.ParseToken(token)
+	if err != nil {
+		return claims, err
+	}
+	return claims, err
+}
+
+

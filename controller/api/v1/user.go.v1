@@ -1,0 +1,221 @@
+package v1
+
+import (
+	"Etpmls-Admin1-Server/controller/api/common"
+	"Etpmls-Admin1-Server/database"
+	"Etpmls-Admin1-Server/library"
+	"Etpmls-Admin1-Server/model"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func UserGetCurrent(c *gin.Context)  {
+	user, err := model.JwtGetUser(c)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "用户获取失败！", nil)
+		return
+	}
+
+	var j model.JsonUserGetOneV1
+	j.Avatar = "暂无"
+	j.Introduction = "用户"
+
+	var roles []string
+	for _, v := range user.Roles {
+		roles = append(roles, v.Name)
+	}
+	j.Roles = roles
+
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "获取用户信息成功！", j)
+	return
+}
+
+func UserRegister(c *gin.Context)  {
+	var j model.JsonUserRegisterV1
+
+	//Bind Data
+	if c.ShouldBindJSON(&j) != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "注册信息不完整！", nil)
+		return
+	}
+
+	//Validate
+	err := library.ValidateRegister(&j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusUnauthorized, 0, err.Error(), nil)
+		return
+	}
+	//Validate User If exists
+	var count int
+	database.DB.Model(&model.User{}).Where("username = ?", j.Username).Count(&count)
+	if count > 0 {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "用户名已存在！", nil)
+		return
+	}
+
+	//Create User
+	id, err := model.UserRegisterV1(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "用户注册失败！", nil)
+		return
+	}
+
+	//Return Token
+	data := map[string]uint{"id": id}
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "注册成功！", data)
+	return
+}
+
+func UserLogin(c *gin.Context)  {
+	var j model.JsonUserLoginV1
+
+	//Bind Data
+	if c.ShouldBindJSON(&j) != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 00001,"提交参数不完整！", nil)
+		return
+	}
+	//Validate
+	err := library.ValidateRegister(&j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusUnauthorized, 0, err.Error(), nil)
+		return
+	}
+
+	id, err := model.UserLoginV1(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 5, err.Error(), nil)
+		return
+	}
+
+	//JWT
+	token, err := library.GetTokenById(id)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0,"Token生成失败！", nil)
+		return
+	}
+
+	//Return Token
+	resData := make(map[string]string)
+	resData["token"] = token
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000,"登录成功！", resData)
+}
+
+func UserLogout(c *gin.Context)  {
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "登出成功！", "success")
+	return
+}
+
+func UserGetAll(c *gin.Context)  {
+	user := model.UserGetAllV1()
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "获取成功！", user)
+	return
+}
+
+func UserCreate(c *gin.Context)  {
+	var j model.JsonUserCreateV1
+
+	//Bind data
+	if c.ShouldBindJSON(&j) != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "注册信息不完整！", nil)
+		return
+	}
+
+	// Validate Json
+	err := library.ValidateZh(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusForbidden, 0, err.Error(), nil)
+		return
+	}
+
+	// Validate Username unique
+	var count int
+	if err := database.DB.Model(&model.User{}).Where("username = ?", j.Username).Count(&count).Error; err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "检验用户名的过程中发生了错误！", nil)
+		return
+	}
+	if count > 0 {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "当前用户名已存在！", nil)
+		return
+	}
+
+	//Create User
+	id, err := model.UserCreateV1(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "创建用户失败！", nil)
+		return
+	}
+
+	//Return Token
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "注册成功！", gin.H{"id": id})
+	return
+}
+
+func UserEdit(c *gin.Context)  {
+	var j model.JsonUserEditV1
+
+	// Bind data
+	if c.ShouldBindJSON(&j) != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "提交信息不完整！", nil)
+		return
+	}
+
+	// Validate Json
+	err := library.ValidateZh(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusForbidden, 0, err.Error(), nil)
+		return
+	}
+
+	// Validate Username Unique
+	var count int
+	database.DB.Model(&model.User{}).Where("username = ?", j.Username).Where("id != ?", j.ID).Count(&count)
+	if (count > 0) {
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "当前用户名已存在！", nil)
+		return
+	}
+	//Validate Password is not empty, Hash Password
+	if len(j.Password) > 0 {
+		j.Password, err = model.BcryptPasswordV1(j.Password)
+		if err != nil {
+			common.ReturnJsonError(c, http.StatusBadRequest, 00002,"服务端故障", nil)
+			return
+		}
+	}
+
+	id, err := model.UserEditV1(j)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusBadRequest, 00002,"更新用户失败！", nil)
+		return
+	}
+
+	//Return Token
+	data := map[string]uint{"id": id}
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, "注册成功！", data)
+	return
+}
+
+func UserDelete(c *gin.Context)  {
+	var u model.UriUserDeleteV1
+	if c.ShouldBindUri(&u) != nil{
+		common.ReturnJsonError(c, http.StatusBadRequest, 0, "提交参数不完整！", nil)
+		return
+	}
+
+	// Validate Form
+	err := library.ValidateZh(u)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusForbidden, 0, "不能删除管理员！", nil)
+		return
+	}
+
+	err = model.UserDeleteV1(u)
+	if err != nil {
+		common.ReturnJsonError(c, http.StatusForbidden, 0, "删除用户失败！", nil)
+		return
+	}
+
+	// Return Message
+	common.ReturnJsonSuccess(c, http.StatusOK, 20000, nil, nil)
+	return
+}
+
