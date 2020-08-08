@@ -27,10 +27,10 @@ app:
 database:
   host: localhost
   port: 5432
-  name: Etpmls-Admin
-  user: postgres
-  password: postgres
-  prefix: etp_
+  name: your-database-name
+  user: your-database-user
+  password: your-database-password
+  prefix: prefix_
 redis:
   address: localhost:6379
   password:
