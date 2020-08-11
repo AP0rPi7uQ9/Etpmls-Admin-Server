@@ -118,6 +118,20 @@ const (
 	ERROR_MESSAGE_PermissionDelete = "权限删除失败！"
 	ERROR_Permission_Check = "000055"
 	ERROR_MESSAGE_Permission_Check = "您没有权限！"
+	ERROR_AttachmentUploadImage_Get_file = "000056"
+	ERROR_MESSAGE_AttachmentUploadImage_Get_file = "获取文件失败！"
+	ERROR_AttachmentUploadImage_Validate = "000057"
+	ERROR_MESSAGE_AttachmentUploadImage_Validate = "图片验证失败！"
+	ERROR_AttachmentUploadImage = "000058"
+	ERROR_MESSAGE_AttachmentUploadImage = "图片上传失败！"
+	ERROR_AttachmentDeleteImage_Bind = "000059"
+	ERROR_MESSAGE_AttachmentDeleteImage_Bind = "提交参数不完整！"
+	ERROR_AttachmentDeleteImage_Validate = "000060"
+	ERROR_MESSAGE_AttachmentDeleteImage_Validate = "数据有误，验证失败！"
+	ERROR_AttachmentDeleteImage_Validate_path = "000061"
+	ERROR_MESSAGE_AttachmentDeleteImage_Validate_path = "删除的路径有误，禁止删除！"
+	ERROR_AttachmentDeleteImage = "000062"
+	ERROR_MESSAGE_AttachmentDeleteImage = "删除失败！"
 )
 
 // Success Code
@@ -163,6 +177,10 @@ const (
 	SUCCESS_MESSAGE_UserLogout = "用户登出成功！"
 	SUCCESS_CaptchaGetOne = "100019"
 	SUCCESS_MESSAGE_CaptchaGetOne = "验证码获取成功！"
+	SUCCESS_UploadImage = "100020"
+	SUCCESS_MESSAGE_UploadImage = "图片上传成功！"
+	SUCCESS_AttachmentDeleteImage = "100021"
+	SUCCESS_MESSAGE_AttachmentDeleteImage = "图片删除成功！"
 )
 
 var (
