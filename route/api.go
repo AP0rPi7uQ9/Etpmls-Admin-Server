@@ -45,7 +45,7 @@ func RouteApi(r *gin.Engine)  {
 				menu.GET("/getAll", v2.MenuGetAll)
 				menu.POST("/create", v2.MenuCreate)
 			}
-			attachment := version2.Group("/attachment")
+			attachment := version2.Group("/attachment", middleware.RoleCheck())
 			{
 				attachment.POST("/uploadImage", v2.AttachmentUploadImage)
 				attachment.DELETE("/deleteImage", v2.AttachmentDeleteImage)
