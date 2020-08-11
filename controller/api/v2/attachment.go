@@ -57,6 +57,6 @@ func AttachmentDeleteImage(c *gin.Context)  {
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UploadImage, core.SUCCESS_MESSAGE_UploadImage, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_AttachmentDeleteImage, core.SUCCESS_MESSAGE_AttachmentDeleteImage, nil)
 	return
 }
