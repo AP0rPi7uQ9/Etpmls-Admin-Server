@@ -91,6 +91,9 @@ func AttachmentValidatePathV2(path string) error {
 	// p := strings.TrimPrefix(path, upload_path)
 	f, err := os.Stat(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
 		return err
 	}
 	// 如果文件是目录
@@ -133,10 +136,7 @@ func AttachmentBatchDeleteV2(s []string) (err error) {
 			return err
 		}
 		// Delete Image
-		err = os.Remove(v)
-		if err != nil {
-			return err
-		}
+		_ = os.Remove(v)
 	}
 
 	// Delete Database
