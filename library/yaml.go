@@ -55,6 +55,9 @@ type configuration struct {
 		Password string
 		DB int
 	}
+	Module struct{
+		Name []string
+	}
 }
 
 var Config = configuration{}
@@ -95,6 +98,7 @@ func init() {
 			return
 		}
 	}
+
 
 	return
 
