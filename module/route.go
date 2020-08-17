@@ -2,10 +2,10 @@ package module
 
 import "github.com/gin-gonic/gin"
 
-func RouteApi(r *gin.Engine)  {
+func Module_RouteApi(r *gin.Engine)  {
 
 }
 
-func RouteWeb(r *gin.Engine)  {
+func Module_RouteWeb(r *gin.Engine)  {
 
 }

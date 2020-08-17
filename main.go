@@ -27,14 +27,14 @@ func initRoute() *gin.Engine {
 
 	// WEB Route
 	route.RouteWeb(router)
-	module.RouteWeb(router)
+	module.Module_RouteWeb(router)
 
 	// Middleware - CORS
 	middleware.InitCors(router)
 
 	// API Route
 	route.RouteApi(router)
-	module.RouteApi(router)
+	module.Module_RouteApi(router)
 
 	return router
 }
