@@ -2,7 +2,6 @@ package route
 
 import (
 	v2 "Etpmls-Admin-Server/controller/api/v2"
-	"Etpmls-Admin-Server/module"
 	"Etpmls-Admin-Server/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -112,5 +111,4 @@ func RouteApi(r *gin.Engine)  {
 		}
 	}*/
 
-	module.Module_RouteApi(r)
 }
