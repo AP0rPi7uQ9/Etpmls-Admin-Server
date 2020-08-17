@@ -62,6 +62,8 @@ type configuration struct {
 
 var Config = configuration{}
 
+var Config_Module = make(map[string]map[interface{}]interface{})
+
 func init() {
 	var yamlPath string
 

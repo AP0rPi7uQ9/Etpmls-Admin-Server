@@ -8,7 +8,7 @@ import (
 )
 
 
-var Module_Config = make(map[string]map[interface{}]interface{})
+
 
 func InitModule()  {
 	var yamlPath string
@@ -26,8 +26,8 @@ func InitModule()  {
 			continue
 		}
 
-		Module_Config[v] = make(map[interface{}]interface{})
-		err = yaml.Unmarshal(b, Module_Config[v])
+		library.Config_Module[v] = make(map[interface{}]interface{})
+		err = yaml.Unmarshal(b, library.Config_Module[v])
 		if err != nil {
 			library.Log.Error("Failed to unmarshal the configuration file! Error:", err)
 			continue
