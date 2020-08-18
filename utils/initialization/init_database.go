@@ -3,6 +3,7 @@ package initialization
 import (
 	"Etpmls-Admin-Server/database"
 	"Etpmls-Admin-Server/library"
+	"Etpmls-Admin-Server/module"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 	"strings"
@@ -23,6 +24,7 @@ func InitDatabase()  {
 	if _, ok := env["INIT_DATABASE"]; ok {
 		if strings.ToUpper(env["INIT_DATABASE"]) == "TRUE" {
 			InsertBasicDataToDatabase()
+			module.InsertModuleDataToDatabase()
 			env["INIT_DATABASE"] = "FALSE"
 		}
 	}

@@ -13,3 +13,5 @@ func initDatabase()  {
 		core.LogInfo.AutoOutputDebug("创建数据库失败！", err)
 	}
 }
+
+func InsertModuleDataToDatabase()  {}
