@@ -7,10 +7,12 @@ import (
 	"os"
 )
 
-
-
-
 func InitModule()  {
+	initYaml()
+	initDatabase()
+}
+
+func initYaml()  {
 	var yamlPath string
 
 	for _, v := range library.Config.Module.Name {

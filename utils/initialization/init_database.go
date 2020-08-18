@@ -63,21 +63,10 @@ func InsertBasicDataToDatabase()  {
 	// Create Permission
 	permission := []database.Permission{
 		{
-			Name: "获取当前用户",
-			Method: "GET",
-			Path: "/api/*/user/getCurrent",
-			Remark: "必选，否则可能导致无法登录",
-			Roles: []database.Role{
-				{
-					Model:       gorm.Model{ID:1},
-				},
-			},
-		},
-		{
 			Name: "查看用户",
 			Method: "GET",
 			Path: "/api/*/user/getAll",
-			Remark: "查看用户数据",
+			Remark: "查看用户列表",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
@@ -118,7 +107,7 @@ func InsertBasicDataToDatabase()  {
 			Name: "查看角色",
 			Method: "GET",
 			Path: "/api/*/role/getAll",
-			Remark: "查看角色数据",
+			Remark: "查看角色列表",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
@@ -159,7 +148,7 @@ func InsertBasicDataToDatabase()  {
 			Name: "查看权限",
 			Method: "GET",
 			Path: "/api/*/permission/getAll",
-			Remark: "查看权限数据",
+			Remark: "查看权限列表",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
@@ -190,17 +179,6 @@ func InsertBasicDataToDatabase()  {
 			Name: "删除权限",
 			Method: "DELETE",
 			Path: "/api/*/permission/delete",
-			Roles: []database.Role{
-				{
-					Model:       gorm.Model{ID:1},
-				},
-			},
-		},
-		{
-			Name: "查看菜单",
-			Method: "GET",
-			Path: "/api/*/menu/getAll",
-			Remark: "查看菜单数据",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
