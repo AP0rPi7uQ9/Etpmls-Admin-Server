@@ -24,6 +24,9 @@ type User struct {
 	Roles []Role `gorm:"many2many:role_users" json:"roles"`
 }
 
+
+// User register
+// 用户注册
 type ApiUserRegisterV2 struct {
 	ID        uint `json:"-"`
 	CreatedAt time.Time	`json:"-"`
@@ -33,77 +36,6 @@ type ApiUserRegisterV2 struct {
 	Password string `binding:"required" json:"password" validate:"max=255"`
 	Roles []Role `gorm:"many2many:role_users" json:"roles"`
 }
-
-type ApiUserLoginV2 struct{
-	ID        uint `json:"-"`
-	CreatedAt time.Time	`json:"-"`
-	UpdatedAt time.Time	`json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
-	Username string `binding:"required" json:"username" validate:"max=255"`
-	Password string `binding:"required" json:"password" validate:"max=255"`
-	CaptchaId string `binding:"required" json:"captcha_id"`
-	Captcha string `binding:"required" json:"captcha"`
-}
-
-type ApiUserLoginWithoutCaptchaV2 struct{
-	ID        uint `json:"-"`
-	CreatedAt time.Time	`json:"-"`
-	UpdatedAt time.Time	`json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
-	Username string `binding:"required" json:"username" validate:"max=255"`
-	Password string `binding:"required" json:"password" validate:"max=255"`
-}
-
-type ApiUserGetAllV2 struct {
-	ID        uint `json:"id"`
-	CreatedAt time.Time	`json:"created_at"`
-	UpdatedAt time.Time	`json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at"`
-	Username string `json:"username"`
-	Password string `json:"-"`
-	Roles []Role `gorm:"many2many:role_users" json:"roles"`
-}
-
-type ApiUserGetCurrentV2 struct {
-	ID        uint `json:"id"`
-	CreatedAt time.Time	`json:"-"`
-	UpdatedAt time.Time	`json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
-	Username string `json:"username"`
-	Password string `json:"-"`
-	Roles []Role `gorm:"many2many:role_users" json:"roles"`
-}
-
-type ApiUserCreateV2 struct {
-	ID        uint `json:"-"`
-	CreatedAt time.Time	`json:"-"`
-	UpdatedAt time.Time	`json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
-	Username string `binding:"required" json:"username" validate:"required,max=50"`
-	Password string `binding:"required" json:"password" validate:"required,max=50"`
-	Roles []Role `gorm:"many2many:role_users" binding:"required" json:"roles"`
-}
-
-type ApiUserEditV2 struct{
-	ID uint `json:"id" binding:"required"`
-	CreatedAt time.Time	`gorm:"-" json:"-"`
-	UpdatedAt time.Time	`json:"-"`
-	DeletedAt gorm.DeletedAt `gorm:"-" json:"-"`
-	Username string `json:"username" binding:"required" validate:"required"`
-	Password string `json:"password" validate:"max=50"`
-	Roles []Role `gorm:"many2many:role_users" binding:"required" json:"roles"`
-}
-
-type ApiUserDeleteV2 struct {
-	ID uint `json:"-"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt *time.Time `json:"-"`
-	Users []User `json:"users" binding:"required" validate:"min=1"`
-}
-
-
-
 func UserRegisterV2(j ApiUserRegisterV2) (id uint, err error) {
 	type User ApiUserRegisterV2
 	var form = User(j)
@@ -122,6 +54,19 @@ func UserRegisterV2(j ApiUserRegisterV2) (id uint, err error) {
 	return form.ID, err
 }
 
+
+// User login
+// 用户登录
+type ApiUserLoginV2 struct{
+	ID        uint `json:"-"`
+	CreatedAt time.Time	`json:"-"`
+	UpdatedAt time.Time	`json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+	Username string `binding:"required" json:"username" validate:"max=255"`
+	Password string `binding:"required" json:"password" validate:"max=255"`
+	CaptchaId string `binding:"required" json:"captcha_id"`
+	Captcha string `binding:"required" json:"captcha"`
+}
 func UserLoginV2(j ApiUserLoginV2) (id uint, username string, err error) {
 	// Validate Captcha
 	if !captcha.VerifyString(j.CaptchaId, j.Captcha){
@@ -133,12 +78,35 @@ func UserLoginV2(j ApiUserLoginV2) (id uint, username string, err error) {
 	return usrID, usrName, err
 }
 
+
+// User login without captcha
+// 用户免验证码登录
+type ApiUserLoginWithoutCaptchaV2 struct{
+	ID        uint `json:"-"`
+	CreatedAt time.Time	`json:"-"`
+	UpdatedAt time.Time	`json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+	Username string `binding:"required" json:"username" validate:"max=255"`
+	Password string `binding:"required" json:"password" validate:"max=255"`
+}
 func UserLoginWithoutCaptchaV2(j ApiUserLoginWithoutCaptchaV2) (id uint, username string, err error) {
 	usrID, usrName, err := UserVerifyV2(j.Username, j.Password)
 
 	return usrID, usrName, err
 }
 
+
+// Get all user
+// 获取全部用户
+type ApiUserGetAllV2 struct {
+	ID        uint `json:"id"`
+	CreatedAt time.Time	`json:"created_at"`
+	UpdatedAt time.Time	`json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	Username string `json:"username"`
+	Password string `json:"-"`
+	Roles []Role `gorm:"many2many:role_users" json:"roles"`
+}
 func UserGetAllV2(c *gin.Context) interface{} {
 	// 重写ApiUserGetAllV2的Roles字段，防止泄露隐私字段信息
 	type Role ApiRoleGetAllV2
@@ -160,6 +128,18 @@ func UserGetAllV2(c *gin.Context) interface{} {
 	return gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count}
 }
 
+
+// Edit User
+// 创建用户
+type ApiUserCreateV2 struct {
+	ID        uint `json:"-"`
+	CreatedAt time.Time	`json:"-"`
+	UpdatedAt time.Time	`json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+	Username string `binding:"required" json:"username" validate:"required,max=50"`
+	Password string `binding:"required" json:"password" validate:"required,max=50"`
+	Roles []Role `gorm:"many2many:role_users" binding:"required" json:"roles"`
+}
 func UserCreateV2(j ApiUserCreateV2) (err error) {
 	type User ApiUserCreateV2
 	form := User(j)
@@ -178,6 +158,18 @@ func UserCreateV2(j ApiUserCreateV2) (err error) {
 	return nil
 }
 
+
+// Edit User
+// 编辑用户
+type ApiUserEditV2 struct{
+	ID uint `json:"id" binding:"required"`
+	CreatedAt time.Time	`json:"created_at"`
+	UpdatedAt time.Time	`json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"-" json:"-"`
+	Username string `json:"username" binding:"required" validate:"required"`
+	Password string `json:"password" validate:"max=50"`
+	Roles []Role `gorm:"many2many:role_users" binding:"required" json:"roles"`
+}
 func UserEditV2(j ApiUserEditV2) (err error) {
 	// If user not set new password
 	if len(j.Password) == 0 {
@@ -211,8 +203,16 @@ func UserEditV2(j ApiUserEditV2) (err error) {
 	return nil
 }
 
+
 // Delete users (allow multiple deletions at the same time)
 // 删除用户（允许同时删除多个）
+type ApiUserDeleteV2 struct {
+	ID uint `json:"-"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+	DeletedAt *time.Time `json:"-"`
+	Users []User `json:"users" binding:"required" validate:"min=1"`
+}
 func UserDeleteV2(ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var u []User
@@ -244,6 +244,7 @@ func UserBcryptPasswordV2(password string) (string, error) {
 	return string(bytes), err
 }
 
+
 // Verify user password
 // 验证用户密码
 func UserVerifyPasswordV2(password, hash string) (bool, error) {
@@ -253,6 +254,7 @@ func UserVerifyPasswordV2(password, hash string) (bool, error) {
 	}
 	return true, err
 }
+
 
 // Verify user logic
 // 验证用户逻辑
@@ -273,6 +275,7 @@ func UserVerifyV2(username string, password string) (id uint, unm string, err er
 	return user.ID, user.Username, err
 }
 
+
 // Get token by ID
 // 通过ID获取Token
 func UserGetTokenV2(userId uint, username string) (string, error) {
@@ -287,7 +290,17 @@ func UserGetTokenV2(userId uint, username string) (string, error) {
 
 }
 
+
 // 通过Token获取当前用户
+type ApiUserGetCurrentV2 struct {
+	ID        uint `json:"id"`
+	CreatedAt time.Time	`json:"-"`
+	UpdatedAt time.Time	`json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+	Username string `json:"username"`
+	Password string `json:"-"`
+	Roles []Role `gorm:"many2many:role_users" json:"roles"`
+}
 func UserGetCurrentV2(token string) (u interface{}, err error) {
 	// Get Claims
 	// 获取Claims
@@ -313,6 +326,7 @@ func UserGetCurrentV2(token string) (u interface{}, err error) {
 
 	return data, nil
 }
+
 
 // 加密密码
 func User_BcryptPasswordV2(password string) (string, error) {
@@ -340,6 +354,7 @@ func User_GetUserByToken(token string) (u User, err error) {
 	return u, nil
 }
 
+// 根据请求信息获取用户
 func User_GetUserByRequest(c *gin.Context) (u User, err error) {
 	token, err := core.GetToken(c)
 	if err != nil {

@@ -14,4 +14,6 @@ func initDatabase()  {
 	}
 }
 
-func InsertModuleDataToDatabase()  {}
+func InsertModuleDataToDatabase()  {
+
+}

@@ -20,6 +20,9 @@ type Permission struct {
 	Roles []Role `gorm:"many2many:role_permissions" json:"roles"`
 }
 
+
+// Create Permission
+// 创建权限
 type ApiPermissionCreateV2 struct {
 	ID        uint `json:"-"`
 	CreatedAt time.Time `json:"-"`
@@ -31,41 +34,6 @@ type ApiPermissionCreateV2 struct {
 	Remark string `json:"remark"`
 	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
-
-type ApiPermissionGetAllV2 struct {
-	ID        uint `json:"id"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
-	Name string `json:"name"`
-	Method string `json:"method"`
-	Path	string	`json:"path"`
-	Remark string `json:"remark"`
-	Roles []Role `gorm:"many2many:role_permissions" json:"roles"`
-}
-
-type ApiPermissionEditV2 struct {
-	ID        uint `json:"id" binding:"required" validate:"min=1"`
-	CreatedAt time.Time `gorm:"-" json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
-	Name string `json:"name" binding:"required" validate:"max=255"`
-	Method string `json:"-"`
-	Path	string	`json:"path" binding:"required" validate:"max=255"`
-	Remark string `json:"remark"`
-	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
-}
-
-type ApiPermissionDeleteV2 struct {
-	ID uint `json:"-"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt *time.Time `json:"-"`
-	Permissions []Permission `json:"permissions" binding:"required" validate:"min=1"`
-}
-
-// Create Permission
-// 创建权限
 func PermissionCreateV2(j ApiPermissionCreateV2) (error) {
 	type Permission ApiPermissionCreateV2
 	form := Permission(j)
@@ -84,6 +52,17 @@ func PermissionCreateV2(j ApiPermissionCreateV2) (error) {
 
 // Get all Permission
 // 获取所有的权限
+type ApiPermissionGetAllV2 struct {
+	ID        uint `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+	Name string `json:"name"`
+	Method string `json:"method"`
+	Path	string	`json:"path"`
+	Remark string `json:"remark"`
+	Roles []Role `gorm:"many2many:role_permissions" json:"roles"`
+}
 func PermissionGetAllV2(c *gin.Context) (interface{}, int64) {
 	type Permission ApiPermissionGetAllV2
 	var data []Permission
@@ -101,6 +80,18 @@ func PermissionGetAllV2(c *gin.Context) (interface{}, int64) {
 
 // Modify Permission
 // 修改权限
+type ApiPermissionEditV2 struct {
+	ID        uint `json:"id" binding:"required" validate:"min=1"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+	Name string `json:"name" binding:"required" validate:"max=255"`
+	Method string `json:"-"`
+	Path	string	`json:"path" binding:"required" validate:"max=255"`
+	Remark string `json:"remark"`
+	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
+}
+
 func PermissionEditV2(j ApiPermissionEditV2) (error) {
 	type Permission ApiPermissionEditV2
 	form := Permission(j)
@@ -119,6 +110,13 @@ func PermissionEditV2(j ApiPermissionEditV2) (error) {
 
 // Delete Permission (allow multiple deletions at the same time)
 // 删除权限（允许同时删除多个）
+type ApiPermissionDeleteV2 struct {
+	ID uint `json:"-"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+	DeletedAt *time.Time `json:"-"`
+	Permissions []Permission `json:"permissions" binding:"required" validate:"min=1"`
+}
 func PermissionDeleteV2(ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var p []Permission
