@@ -2,6 +2,7 @@ package v2
 
 import (
 	"Etpmls-Admin-Server/core"
+	"Etpmls-Admin-Server/library"
 	"Etpmls-Admin-Server/model"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,32 @@ import (
 )
 
 func MenuGetAll(c *gin.Context)  {
-	ctx, err := ioutil.ReadFile("./storage/menu/menu.json")
-	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_GET_MENU_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_GET_MENU_FAILED, nil, err)
-		return
+	var (
+		ctx []byte
+		err error
+	)
+
+	if library.Config.App.Cache {
+		ctx, err = library.Redis.Get(library.RedisCtx, core.Cache_MenuGetAll).Bytes()
+		if err != nil {
+			ctx, err = ioutil.ReadFile("./storage/menu/menu.json")
+			if err != nil {
+				core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_GET_MENU_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_GET_MENU_FAILED, nil, err)
+				return
+			}
+			// Save menu
+			// 储存菜单
+			err2 := library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, ctx, 0).Err()
+			if err2 != nil {
+				core.LogError.Output(err)
+			}
+		}
+	} else {
+		ctx, err = ioutil.ReadFile("./storage/menu/menu.json")
+		if err != nil {
+			core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_GET_MENU_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_GET_MENU_FAILED, nil, err)
+			return
+		}
 	}
 
 	var j interface{}

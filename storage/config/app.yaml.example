@@ -3,6 +3,7 @@ app:
   captcha: true
   register: false
   key:
+  cache: true
   log:
     level: info
     panic: 3

@@ -6,8 +6,16 @@ import (
 )
 
 var Redis *redis.Client
+var RedisCtx = context.Background()
 
 func InitRedis()  {
+
+	//	If the cache is not turned on, skip redis initialization
+	//	如果没有开启缓存则跳过redis初始化
+	if !Config.App.Cache {
+		return
+	}
+
 	Redis = redis.NewClient(&redis.Options{
 		Addr:     Config.Redis.Address,
 		Password: Config.Redis.Password, // no password set

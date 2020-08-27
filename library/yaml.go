@@ -15,6 +15,7 @@ type configuration struct {
 		Captcha bool
 		Register bool
 		Key string
+		Cache bool
 		Log struct {
 			Level string
 			Panic	int
