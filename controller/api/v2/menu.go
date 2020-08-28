@@ -27,9 +27,13 @@ func MenuGetAll(c *gin.Context)  {
 			}
 			// Save menu
 			// 储存菜单
-			err2 := library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, ctx, 0).Err()
-			if err2 != nil {
+			err = library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, ctx, 0).Err()
+			if err != nil {
 				core.LogError.Output(err)
+				err = library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
+				if err != nil {
+					core.LogError.Output(err)
+				}
 			}
 		}
 	} else {
@@ -84,6 +88,21 @@ func MenuCreate(c *gin.Context)  {
 		}
 
 		return
+	}
+
+	// Cache
+	// 缓存
+	if library.Config.App.Cache {
+		// Save menu
+		// 储存菜单
+		err := library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, s, 0).Err()
+		if err != nil {
+			core.LogError.Output(err)
+			err = library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
+			if err != nil {
+				core.LogError.Output(err)
+			}
+		}
 	}
 
 	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_MenuCreate, core.SUCCESS_MESSAGE_MenuCreate, j)
