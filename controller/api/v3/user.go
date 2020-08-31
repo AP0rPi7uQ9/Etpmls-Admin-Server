@@ -1,4 +1,4 @@
-package v2
+package v3
 
 import (
 	"Etpmls-Admin-Server/core"
@@ -158,7 +158,7 @@ func UserGetCurrent(c *gin.Context)  {
 	c.JSON(http.StatusOK, gin.H{"code": 200, "status":"success", "msg": "success", "data": gin.H{
 		"avatar": "https://i.gtimg.cn/club/item/face/img/8/15918_100.gif",
 		"username" : "admin",
-		"permissions": a,
+		"roles": a,
 	}})
 	return
 
