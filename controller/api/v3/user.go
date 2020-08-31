@@ -154,24 +154,24 @@ func UserGetAll(c *gin.Context)  {
 // Get current user
 // 获取当前用户
 func UserGetCurrent(c *gin.Context)  {
-	var a =  []string{"admin"}
+	/*var a =  []string{"admin"}
 	c.JSON(http.StatusOK, gin.H{"code": 200, "status":"success", "msg": "success", "data": gin.H{
 		"avatar": "https://i.gtimg.cn/club/item/face/img/8/15918_100.gif",
 		"username" : "admin",
 		"roles": a,
 	}})
-	return
+	return*/
 
 
 	//Get Token
 	// 获取token
-	token, err := core.GetToken(c)
+	/*token, err := core.GetToken(c)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.UserGetCurrent_GET_TOKEN_ERROR, core.UserGetCurrent_GET_TOKEN_ERROR_MESSAGE, nil, err)
 		return
-	}
+	}*/
 
-	u, err := model.UserGetCurrentV2(token)
+	u, err := model.UserGetCurrentV3(c)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserGetCurrent_GET_USER_FAILED, core.ERROR_MESSAGE_UserGetCurrent_GET_USER_FAILED, nil, err)
 		return
@@ -225,7 +225,7 @@ func UserCreate(c *gin.Context)  {
 // Edit user
 // 编辑用户
 func UserEdit(c *gin.Context)  {
-	var j model.ApiUserEditV2
+	var j model.ApiUserEditV3
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -256,7 +256,7 @@ func UserEdit(c *gin.Context)  {
 		}
 	}*/
 
-	err = model.UserEditV2(j)
+	err = model.UserEditV3(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit, core.ERROR_MESSAGE_UserEdit, nil, err)
 		return
@@ -298,5 +298,47 @@ func UserDelete(c *gin.Context)  {
 
 	// Return Message
 	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UserDelete, core.SUCCESS_MESSAGE_UserDelete, nil)
+	return
+}
+
+// Update user information
+// 更新用户信息
+func UserUpdateInformation(c *gin.Context)  {
+	var j model.ApiUserUpdateInformationV1
+
+	// Bind data
+	if err := c.ShouldBindJSON(&j); err != nil {
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Bind, core.ERROR_MESSAGE_Bind_data, nil, err)
+		return
+	}
+
+	// Validate Json
+	err := library.ValidateZh(j)
+	if err != nil {
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Validate, core.ERROR_MESSAGE_Validate, nil, err)
+		return
+	}
+
+	// Get current user id
+	j.ID, err = model.User_GetUserIdByRequest(c)
+	if err != nil {
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Get_current_user_id, core.ERROR_MESSAGE_Get_current_user_information, nil, err)
+		return
+	}
+
+	// Modification of other people’s information is not allowed
+	/*if id != j.ID {
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Edit_others, core.ERROR_MESSAGE_Permission_denied, nil, err)
+		return
+	}*/
+
+	err = model.UserUpdateInformationV1(j)
+	if err != nil {
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation, core.ERROR_MESSAGE_Internal, nil, err)
+		return
+	}
+
+	//Return Token
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Internal, core.SUCCESS_MESSAGE_Internal, nil)
 	return
 }

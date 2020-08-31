@@ -132,11 +132,28 @@ const (
 	ERROR_MESSAGE_AttachmentDeleteImage_Validate_path = "删除的路径有误，禁止删除！"
 	ERROR_AttachmentDeleteImage = "000062"
 	ERROR_MESSAGE_AttachmentDeleteImage = "删除失败！"
+	ERROR_UserUpdateInformation_Bind = "000063"
+	ERROR_UserUpdateInformation_Validate = "000064"
+	ERROR_UserUpdateInformation = "000065"
+	ERROR_UserUpdateInformation_Get_current_user_id = "000066"
+	// ERROR_UserUpdateInformation_Edit_others = "000067"
+)
+
+// Error Message
+// 错误信息
+const (
+	ERROR_MESSAGE_Bind_data = "提交的参数存在错误"
+	ERROR_MESSAGE_Validate = "参数验证失败"
+	ERROR_MESSAGE_Get_current_user_information = "获取当前用户信息失败"
+	ERROR_MESSAGE_Permission_denied = "权限不足"
+	ERROR_MESSAGE_Internal = "处理失败"
 )
 
 // Success Code
 // 成功码
 const (
+	SUCCESS_Internal = "200000"
+
 	USER_LOGIN_SUCCESS = "100000"
 	USER_LOGIN_SUCCESS_MESSAGE = "用户登录成功！"
 	USER_LOGIN_WITHOUT_CAPTCHA_SUCCESS = "100001"
@@ -181,6 +198,12 @@ const (
 	SUCCESS_MESSAGE_UploadImage = "图片上传成功！"
 	SUCCESS_AttachmentDeleteImage = "100021"
 	SUCCESS_MESSAGE_AttachmentDeleteImage = "图片删除成功！"
+
+)
+
+// Success Message
+const (
+	SUCCESS_MESSAGE_Internal = "处理成功"
 )
 
 var (

@@ -10,6 +10,7 @@ type User struct {
 	gorm.Model
 	Username string `gorm:"unique;not null"`
 	Password string `gorm:"not null"`
+	Avatar Attachment	`gorm:"polymorphic:Owner;polymorphicValue:user-avatar"`
 	Roles []Role `gorm:"many2many:role_users;"`
 }
 

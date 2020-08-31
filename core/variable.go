@@ -5,4 +5,5 @@ package core
 // Redis变量
 var (
 	Cache_MenuGetAll = "MenuGetAll"
+	Cache_UserGetCurrent = "UserGetCurrent"
 )

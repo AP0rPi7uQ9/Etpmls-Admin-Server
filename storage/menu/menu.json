@@ -1,1 +1,41 @@
-[{"alwaysShow":true,"children":[{"component":"views/etpmls-admin/user/user/index","meta":{"title":"User"},"name":"User","path":"user"},{"component":"views/etpmls-admin/user/role/index","meta":{"title":"Role"},"name":"Role","path":"role"},{"component":"views/etpmls-admin/user/permission/index","meta":{"title":"Permission"},"name":"Permission","path":"permission"},{"component":"views/etpmls-admin/user/menu/index","meta":{"title":"Menu"},"name":"Menu","path":"menu"}],"component":"Layout","meta":{"icon":"peoples","roles":["admin"],"title":"User"},"name":"Users","path":"/users","redirect":"/users/user"}]
+[{
+  "alwaysShow": true,
+  "children": [{
+    "component": "views/etpmls-admin/user/user/index",
+    "meta": {
+      "title": "User"
+    },
+    "name": "User",
+    "path": "user"
+  }, {
+    "component": "views/etpmls-admin/user/role/index",
+    "meta": {
+      "title": "Role"
+    },
+    "name": "Role",
+    "path": "role"
+  }, {
+    "component": "views/etpmls-admin/user/permission/index",
+    "meta": {
+      "title": "Permission"
+    },
+    "name": "Permission",
+    "path": "permission"
+  }, {
+    "component": "views/etpmls-admin/user/menu/index",
+    "meta": {
+      "title": "Menu"
+    },
+    "name": "Menu",
+    "path": "menu"
+  }],
+  "component": "Layout",
+  "meta": {
+    "icon": "peoples",
+    "roles": ["Administrator"],
+    "title": "User"
+  },
+  "name": "Users",
+  "path": "/users",
+  "redirect": "/users/user"
+}]

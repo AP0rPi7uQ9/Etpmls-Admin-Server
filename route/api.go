@@ -25,6 +25,7 @@ func RouteApi(r *gin.Engine)  {
 				user.POST("/create", v3.UserCreate, middleware.RoleCheck())
 				user.PUT("/edit", v3.UserEdit, middleware.RoleCheck())
 				user.DELETE("/delete", v3.UserDelete, middleware.RoleCheck())
+				user.PUT("/updateInformation", v3.UserUpdateInformation, middleware.BasicCheck())
 			}
 			role := version2.Group("/role", middleware.RoleCheck())
 			{
