@@ -342,6 +342,12 @@ func UserUpdateInformationV1(j ApiUserUpdateInformationV1) error {
 		}
 
 		// 4.更新
+
+		// Update password if exists
+		if len(j.Password) > 0 {
+			j.Password, err = User_BcryptPasswordV2(j.Password)
+		}
+
 		result := tx.Debug().Model(&User{ID: j.ID}).Updates(&j)
 		if result.Error != nil {
 			return result.Error
@@ -498,7 +504,9 @@ func UserGetCurrent_NotCacheV1(c *gin.Context) (interface{}, error) {
 		if err != nil {
 			core.LogError.Output(err)
 		} else {
-			err = library.Redis.HSet(library.RedisCtx, string(u.ID), string(b)).Err()
+			var m = make(map[string]interface{})
+			m[strconv.Itoa(int(u.ID))] = string(b)
+			err = library.Redis.HSet(library.RedisCtx, core.Cache_UserGetCurrent, m).Err()
 			if err != nil {
 				core.LogError.Output(err)
 			}
