@@ -475,14 +475,29 @@ func UserGetCurrentV3(c *gin.Context) (interface{}, error) {
 	}
 }
 func UserGetCurrent_NotCacheV1(c *gin.Context) (interface{}, error) {
+	// Get User By request
 	u, err := User_GetUserByRequest(c)
 	if err != nil {
 		return nil, err
 	}
 
+	// Ignore the avatar tag in the User structure
+	type tmp struct {
+		User
+		Avatar string	`json:"avatar"`
+	}
+	var tmpUser = tmp{User: u}
+
 	var userApi ApiUserGetCurrentV3
-	userApi.Username = u.Username
-	userApi.Password = u.Password
+	b, err := json.Marshal(tmpUser)
+	if err != nil {
+		return nil, err
+	}
+	// Get the filtered structure - ApiUserGetCurrentV3
+	err = json.Unmarshal(b, &userApi)
+	if err != nil {
+		return nil, err
+	}
 
 	// Avatar
 	var a Attachment
