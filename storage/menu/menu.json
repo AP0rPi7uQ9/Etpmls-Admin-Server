@@ -1,41 +1,41 @@
 [{
   "alwaysShow": true,
   "children": [{
-    "component": "views/etpmls-admin/user/user/index",
+    "component": "views/etpmls-admin/user/index",
     "meta": {
-      "title": "User"
+      "title": "user"
     },
     "name": "User",
     "path": "user"
   }, {
-    "component": "views/etpmls-admin/user/role/index",
+    "component": "views/etpmls-admin/role/index",
     "meta": {
-      "title": "Role"
+      "title": "role"
     },
     "name": "Role",
     "path": "role"
   }, {
-    "component": "views/etpmls-admin/user/permission/index",
+    "component": "views/etpmls-admin/permission/index",
     "meta": {
-      "title": "Permission"
+      "title": "permission"
     },
     "name": "Permission",
     "path": "permission"
   }, {
-    "component": "views/etpmls-admin/user/menu/index",
+    "component": "views/etpmls-admin/menu/index",
     "meta": {
-      "title": "Menu"
+      "title": "menu"
     },
     "name": "Menu",
     "path": "menu"
   }],
   "component": "Layout",
   "meta": {
-    "icon": "peoples",
+    "icon": "el-icon-s-tools",
     "roles": ["Administrator"],
-    "title": "User"
+    "title": "admin"
   },
-  "name": "Users",
-  "path": "/users",
-  "redirect": "/users/user"
+  "name": "Admin",
+  "path": "/admin",
+  "redirect": "/admin/user"
 }]
