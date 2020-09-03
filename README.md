@@ -2,6 +2,16 @@
 
 ## Configuration 配置
 
+[Ecology|Plug-in development|globalization]
+
+[生态|插件式开发|国际化]
+
+此项目为Etpmls-Admin后端源码
+
+This project is the Etpmls-Admin backend source code
+
+
+
 1.Copy .env.example to .env
 
 1.将.env.example复制到.env
