@@ -12,9 +12,14 @@ type JwtGo struct {
 	MySigningKey []byte
 }
 
+
 // Create Token
 // 创建令牌
-func (j JwtGo)JwtGoCreateToken(claims *jwt.StandardClaims) (t string, err error) {
+func (j *JwtGo)CreateToken(c interface{}) (t string, err error) {
+	claims, ok := c.(*jwt.StandardClaims)
+	if !ok {
+		return "", err
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, err := token.SignedString(j.MySigningKey)
 	if err != nil {
@@ -23,9 +28,10 @@ func (j JwtGo)JwtGoCreateToken(claims *jwt.StandardClaims) (t string, err error)
 	return ss, err
 }
 
+
 // Parse Token
 // 解析令牌
-func (j JwtGo)JwtGoParseToken(tokenString string) (t *jwt.Token, err error) {
+func (j *JwtGo)ParseToken(tokenString string) (t interface{}, err error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return j.MySigningKey, nil
 	})
@@ -50,10 +56,43 @@ func (j JwtGo)JwtGoParseToken(tokenString string) (t *jwt.Token, err error) {
 	}
 }
 
-// 获取用户ID
-func (j JwtGo)JwtGoGetToeknId(tokenString string) (userId uint, err error) {
-	tk, err := j.JwtGoParseToken(tokenString)
+
+// Get Username
+// 获取用户名
+func (j *JwtGo)GetIssuerByToken(tokenString string) (issuer string, err error) {
+	tmp, err := j.ParseToken(tokenString)
 	if err != nil {
+		return "", err
+	}
+
+	tk, ok := tmp.(*jwt.Token)
+	if !ok {
+		return "", err
+	}
+
+	if claims, ok := tk.Claims.(jwt.MapClaims); ok && tk.Valid {
+		issuer, ok := claims["iss"].(string)
+		if !ok {
+			return "", errors.New("令牌ID解析错误！")
+		}
+
+		return issuer, nil
+	}
+
+	return "", errors.New("当前token无效！")
+}
+
+
+// Get User ID
+// 获取用户ID
+func (j *JwtGo)GetIdByToken(tokenString string) (userId uint, err error) {
+	tmp, err := j.ParseToken(tokenString)
+	if err != nil {
+		return 0, err
+	}
+
+	tk, ok := tmp.(*jwt.Token)
+	if !ok {
 		return 0, err
 	}
 
@@ -76,21 +115,5 @@ func (j JwtGo)JwtGoGetToeknId(tokenString string) (userId uint, err error) {
 	return 0, errors.New("当前token无效！")
 }
 
-// 获取用户ID
-func (j JwtGo)JwtGoGetTokenIssuer(tokenString string) (issuer string, err error) {
-	tk, err := j.JwtGoParseToken(tokenString)
-	if err != nil {
-		return "", err
-	}
 
-	if claims, ok := tk.Claims.(jwt.MapClaims); ok && tk.Valid {
-		issuer, ok := claims["iss"].(string)
-		if !ok {
-			return "", errors.New("令牌ID解析错误！")
-		}
 
-		return issuer, nil
-	}
-
-	return "", errors.New("当前token无效！")
-}

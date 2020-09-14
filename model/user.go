@@ -367,10 +367,7 @@ func (this *User) UserVerify(username string, password string) (id uint, unm str
 // Get token by ID
 // 通过ID获取Token
 func (this *User) UserGetToken(userId uint, username string) (string, error) {
-	var k = library.JwtGo {
-		MySigningKey: []byte(library.Config.App.Key),
-	}
-	return k.JwtGoCreateToken(&jwt.StandardClaims{
+	return library.Jwt_Token.CreateToken(&jwt.StandardClaims{
 		Id: strconv.Itoa(int(userId)),	// 用户ID
 		ExpiresAt: time.Now().Add(time.Hour * 12).Unix(),	// 过期时间 - 12个小时
 		Issuer:    username,	// 发行者
@@ -491,17 +488,13 @@ func (this *User) User_BcryptPasswordV2(password string) (string, error) {
 
 // 根据token获取用户
 func (this *User) User_GetUserByToken(token string) (u User, err error) {
-	// 获取Claims
-	var k = library.JwtGo {
-		MySigningKey: []byte(library.Config.App.Key),
-	}
 	// 从Token获取ID
-	id, err := k.JwtGoGetToeknId(token)
+	id, err := library.Jwt_Token.GetIdByToken(token)
 	if err != nil {
 		return u, err
 	}
 	// 从Token获取username
-	username, err  := k.JwtGoGetTokenIssuer(token)
+	username, err  := library.Jwt_Token.GetIssuerByToken(token)
 	if err != nil {
 		return u, err
 	}
@@ -546,12 +539,8 @@ func (this *User) User_GetUserIdByRequest(c *gin.Context) (id uint, err error) {
 
 // 根据token获取用户id
 func (this *User) User_GetUserIdByToken(token string) (id uint, err error) {
-	// 获取Claims
-	var k = library.JwtGo {
-		MySigningKey: []byte(library.Config.App.Key),
-	}
 	// 从Token获取ID
-	id, err = k.JwtGoGetToeknId(token)
+	id, err = library.Jwt_Token.GetIdByToken(token)
 	if err != nil {
 		return 0, err
 	}

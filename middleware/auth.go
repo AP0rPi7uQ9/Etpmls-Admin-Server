@@ -29,10 +29,7 @@ func BasicCheck() gin.HandlerFunc {
 
 		// Get Claims
 		// 获取Claims
-		var k = library.JwtGo {
-			MySigningKey: []byte(library.Config.App.Key),
-		}
-		_, err = k.JwtGoParseToken(token)
+		_, err = library.Jwt_Token.ParseToken(token)
 		if err != nil {
 			core.JsonError(c, http.StatusPaymentRequired, core.MIDDLEWARE_PARSE_TOKEN_ERROR, core.MIDDLEWARE_PARSE_TOKEN_ERROR_MESSAGE, nil, err)
 			c.Abort()
@@ -60,11 +57,9 @@ func RoleCheck() gin.HandlerFunc {
 
 		// Get Claims
 		// 获取Claims
-		var k = library.JwtGo {
-			MySigningKey: []byte(library.Config.App.Key),
-		}
-		tk, err := k.JwtGoParseToken(token)
-		if err != nil {
+		tmp, err := library.Jwt_Token.ParseToken(token)
+		tk, ok := tmp.(*jwt.Token)
+		if !ok || err != nil {
 			core.JsonError(c, http.StatusPaymentRequired, core.MIDDLEWARE_PARSE_TOKEN_ERROR, core.MIDDLEWARE_PARSE_TOKEN_ERROR_MESSAGE, nil, err)
 			c.Abort()
 			return
