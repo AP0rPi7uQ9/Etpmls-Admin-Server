@@ -15,13 +15,14 @@ func AttachmentUploadImage(c *gin.Context)  {
 		return
 	}
 
-	extension, err := model.AttachmentValidateImageV2(file)
+	var a model.Attachment
+	extension, err := a.AttachmentValidateImage(file)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentUploadImage_Validate, core.ERROR_MESSAGE_AttachmentUploadImage_Validate, nil, err)
 		return
 	}
 
-	path, err := model.AttachmentUploadImageV2(c, file, extension)
+	path, err := a.AttachmentUploadImage(c, file, extension)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentUploadImage, core.ERROR_MESSAGE_AttachmentUploadImage, nil, err)
 		return
@@ -32,7 +33,7 @@ func AttachmentUploadImage(c *gin.Context)  {
 }
 
 func AttachmentDeleteImage(c *gin.Context)  {
-	var j model.ApiAttachmentDeleteImageV2
+	var j model.ApiAttachmentDeleteImage
 	if err := c.ShouldBindJSON(&j); err != nil{
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage_Bind, core.ERROR_MESSAGE_AttachmentDeleteImage_Bind, nil, err)
 		return
@@ -45,14 +46,15 @@ func AttachmentDeleteImage(c *gin.Context)  {
 		return
 	}
 	// Validate Path
-	err = model.AttachmentValidatePathV2(j.Path)
+	var a model.Attachment
+	err = a.AttachmentValidatePath(j.Path)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage_Validate_path, core.ERROR_MESSAGE_AttachmentDeleteImage_Validate_path, nil, err)
 		return
 	}
 
 	// Delete Image
-	if err = model.AttachmentDeleteImageV2(j); err != nil {
+	if err = a.AttachmentDeleteImage(j); err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage, core.ERROR_MESSAGE_AttachmentDeleteImage, nil, err)
 		return
 	}

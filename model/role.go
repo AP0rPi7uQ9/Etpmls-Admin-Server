@@ -82,7 +82,7 @@ func (this *Role) RoleGetAll(c *gin.Context) (interface{}, int64) {
 	type Role ApiRoleGetAll
 	var data []Role
 
-	limit, offset := CommonGetPageByQuery(c)
+	limit, offset := Common_GetPageByQuery(c)
 	var count int64
 	// Get the title of the search, if not get all the data
 	// 获取搜索的标题，如果没有获取全部数据

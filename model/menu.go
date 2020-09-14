@@ -40,9 +40,9 @@ func (this *Menu) MenuCreate(j ApiMenuCreate) (error) {
 		core.LogError.AutoOutputDebug("写入菜单文件失败！", err)
 
 		// 还原历史菜单
-		err = os.Rename("storage/menu/menu.json.bak", "storage/menu/menu.json")
-		if err != nil {
-			core.LogError.AutoOutputDebug("备份菜单文件还原失败！", err)
+		err2 := os.Rename("storage/menu/menu.json.bak", "storage/menu/menu.json")
+		if err2 != nil {
+			core.LogError.AutoOutputDebug("备份菜单文件还原失败！", err2)
 		}
 
 		return err
@@ -69,6 +69,7 @@ func (this *Menu) menu_GetAll_Cache() (interface{}, error) {
 		if err == redis.Nil {
 			return this.menu_GetAll_NoCache()
 		}
+		core.LogError.Output(err)
 		return nil, err
 	}
 
@@ -95,10 +96,12 @@ func (this *Menu) menu_GetAll_NoCache() (interface{}, error) {
 	err = library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, ctx, 0).Err()
 	if err != nil {
 		core.LogError.Output(err)
-		err = library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
-		if err != nil {
-			core.LogError.Output(err)
+		err2 := library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
+		if err2 != nil {
+			core.LogError.Output(err2)
+			return nil, err2
 		}
+		return nil, err
 	}
 
 	var j interface{}

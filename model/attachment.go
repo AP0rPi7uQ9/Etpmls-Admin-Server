@@ -26,9 +26,10 @@ type Attachment struct {
 	OwnerType string	`json:"owner_type"`
 }
 
+
 // Validate if file is a image
 // 验证文件是否为图片
-func AttachmentValidateImageV2(h *multipart.FileHeader) (s string, err error) {
+func (this *Attachment) AttachmentValidateImage(h *multipart.FileHeader) (s string, err error) {
 	f, err := h.Open()
 	if err != nil {
 		return s, err
@@ -53,9 +54,10 @@ func AttachmentValidateImageV2(h *multipart.FileHeader) (s string, err error) {
 	}
 }
 
+
 // Upload Image
 // 上传图片
-func AttachmentUploadImageV2(c *gin.Context, file *multipart.FileHeader, extension string) (p string, err error) {
+func (this *Attachment) AttachmentUploadImage(c *gin.Context, file *multipart.FileHeader, extension string) (p string, err error) {
 	// Make Dir
 	t := time.Now().Format("20060102")
 	path := "storage/upload/" + t + "/"
@@ -79,9 +81,10 @@ func AttachmentUploadImageV2(c *gin.Context, file *multipart.FileHeader, extensi
 	return file_path, err
 }
 
+
 // Validate Path is a file in storage/upload
 // 严重路径是否在storage/upload中
-func AttachmentValidatePathV2(path string) error {
+func (this *Attachment) AttachmentValidatePath(path string) error {
 	const upload_path = "storage/upload/"
 	// 截取前十五个字符判断和Path是否相同
 	if len(path) <= len(upload_path) || !strings.Contains(path[:len(upload_path)], upload_path) {
@@ -103,16 +106,17 @@ func AttachmentValidatePathV2(path string) error {
 	return nil
 }
 
-type ApiAttachmentDeleteImageV2 struct {
+
+// Delete Image
+// 删除图片
+type ApiAttachmentDeleteImage struct {
 	ID uint `json:"-"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt *time.Time `json:"-"`
 	Path string	`json:"path" binding:"required"`
 }
-// Delete Image
-// 删除图片
-func AttachmentDeleteImageV2(j ApiAttachmentDeleteImageV2) (err error) {
+func (this *Attachment) AttachmentDeleteImage(j ApiAttachmentDeleteImage) (err error) {
 	err = os.Remove(j.Path)
 	if err != nil {
 		return err
@@ -126,12 +130,13 @@ func AttachmentDeleteImageV2(j ApiAttachmentDeleteImageV2) (err error) {
 	return err
 }
 
+
 // Batch delete any type of files in storage/upload/
 // 批量删除storage/upload/中的任何类型文件
-func AttachmentBatchDeleteV2(s []string) (err error) {
+func (this *Attachment) AttachmentBatchDelete(s []string) (err error) {
 	for _, v := range s {
 		// Validate If a File
-		err = AttachmentValidatePathV2(v)
+		err = this.AttachmentValidatePath(v)
 		if err != nil {
 			return err
 		}

@@ -8,7 +8,7 @@ import (
 
 
 // 根据PageNO和PageSize获取分页
-func CommonGetPageByQuery(c *gin.Context) (limit int, offset int) {
+func Common_GetPageByQuery(c *gin.Context) (limit int, offset int) {
 	limit = -1
 	offset = -1
 

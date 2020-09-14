@@ -121,7 +121,7 @@ func (this *User) UserGetAll(c *gin.Context) interface{} {
 	var data []User
 
 	// 获取分页和标题
-	limit, offset := CommonGetPageByQuery(c)
+	limit, offset := Common_GetPageByQuery(c)
 	var count int64
 	// Get the title of the search, if not get all the data
 	// 获取搜索的标题，如果没有获取全部数据
@@ -287,7 +287,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 		// 如果找到记录则删除
 		if result2.RowsAffected > 0 {
 			// 根据Path删除附件
-			err := AttachmentBatchDeleteV2([]string{old.Path})
+			err := old.AttachmentBatchDelete([]string{old.Path})
 			if err != nil {
 				return err
 			}
