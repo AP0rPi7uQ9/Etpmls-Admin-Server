@@ -19,7 +19,7 @@ func UserRegister(c *gin.Context)  {
 		return
 	}
 
-	var j model.ApiUserRegisterV2
+	var j model.ApiUserRegister
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -43,7 +43,8 @@ func UserRegister(c *gin.Context)  {
 	}
 
 	//Create User
-	id, err := model.UserRegisterV2(j)
+	var u model.User
+	id, err := u.UserRegister(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.USER_REGISTER_ERROR, core.USER_REGISTER_ERROR_MESSAGE, nil, err)
 		return
@@ -66,7 +67,7 @@ func UserLogin(c *gin.Context)  {
 		return
 	}
 
-	var j model.ApiUserLoginV2
+	var j model.ApiUserLogin
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -81,14 +82,16 @@ func UserLogin(c *gin.Context)  {
 		return
 	}
 
-	id, username, err := model.UserLoginV2(j)
+	var u model.User
+	id, username, err := u.UserLogin(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_ERROR, core.USER_LOGIN_ERROR_MESSAGE, nil, err)
 		return
 	}
 
 	//JWT
-	token, err := model.UserGetTokenV2(id, username)
+	var us model.User
+	token, err := us.UserGetToken(id, username)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.USER_GET_TOKEN_ERROR, core.USER_GET_TOKEN_ERROR_MESSAGE, nil, err)
 		return
@@ -103,7 +106,7 @@ func UserLogin(c *gin.Context)  {
 // User login Without Captcha
 // 用户无验证码登录
 func UserLoginWithoutCaptcha(c *gin.Context)  {
-	var j model.ApiUserLoginWithoutCaptchaV2
+	var j model.ApiUserLoginWithoutCaptcha
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -118,14 +121,16 @@ func UserLoginWithoutCaptcha(c *gin.Context)  {
 		return
 	}
 
-	id, username, err := model.UserLoginWithoutCaptchaV2(j)
+	var u model.User
+	id, username, err := u.UserLoginWithoutCaptcha(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_WITHOUT_CAPTCHA_ERROR, core.USER_LOGIN_WITHOUT_CAPTCHA_ERROR_MESSAGE, nil, err)
 		return
 	}
 
 	//JWT
-	token, err := model.UserGetTokenV2(id, username)
+	var us model.User
+	token, err := us.UserGetToken(id, username)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.USER_GET_TOKEN_WITHOUT_CAPTCHA_ERROR, core.USER_GET_TOKEN_WITHOUT_CAPTCHA_ERROR_MESSAGE, nil, err)
 		return
@@ -146,7 +151,8 @@ func UserLogout(c *gin.Context)  {
 // Get all users
 // 获取所有用户
 func UserGetAll(c *gin.Context)  {
-	data := model.UserGetAllV2(c)
+	var u model.User
+	data := u.UserGetAll(c)
 	core.JsonSuccess(c, http.StatusOK, core.USER_GET_ALL_SUCCESS, core.USER_GET_ALL_SUCCESS_MESSAGE, data)
 	return
 }
@@ -154,24 +160,8 @@ func UserGetAll(c *gin.Context)  {
 // Get current user
 // 获取当前用户
 func UserGetCurrent(c *gin.Context)  {
-	/*var a =  []string{"admin"}
-	c.JSON(http.StatusOK, gin.H{"code": 200, "status":"success", "msg": "success", "data": gin.H{
-		"avatar": "https://i.gtimg.cn/club/item/face/img/8/15918_100.gif",
-		"username" : "admin",
-		"roles": a,
-	}})
-	return*/
-
-
-	//Get Token
-	// 获取token
-	/*token, err := core.GetToken(c)
-	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.UserGetCurrent_GET_TOKEN_ERROR, core.UserGetCurrent_GET_TOKEN_ERROR_MESSAGE, nil, err)
-		return
-	}*/
-
-	u, err := model.UserGetCurrentV3(c)
+	var us model.User
+	u, err := us.UserGetCurrent(c)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserGetCurrent_GET_USER_FAILED, core.ERROR_MESSAGE_UserGetCurrent_GET_USER_FAILED, nil, err)
 		return
@@ -184,7 +174,7 @@ func UserGetCurrent(c *gin.Context)  {
 // Create User
 // 创建用户
 func UserCreate(c *gin.Context)  {
-	var j model.ApiUserCreateV2
+	var j model.ApiUserCreate
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -211,7 +201,8 @@ func UserCreate(c *gin.Context)  {
 	}
 
 	//Create User
-	err = model.UserCreateV2(j)
+	var u model.User
+	err = u.UserCreate(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserCreate, core.ERROR_MESSAGE_UserCreate, nil, err)
 		return
@@ -225,7 +216,7 @@ func UserCreate(c *gin.Context)  {
 // Edit user
 // 编辑用户
 func UserEdit(c *gin.Context)  {
-	var j model.ApiUserEditV3
+	var j model.ApiUserEdit
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -247,16 +238,9 @@ func UserEdit(c *gin.Context)  {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit_Duplicate_user, core.ERROR_MESSAGE_UserEdit_Duplicate_user, nil, err)
 		return
 	}
-	//Validate Password is not empty, Hash Password
-	/*if len(j.Password) > 0 {
-		j.Password, err = model.User_BcryptPasswordV2(j.Password)
-		if err != nil {
-			core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit_Password_resolution, core.ERROR_MESSAGE_UserEdit_Password_resolution, nil, err)
-			return
-		}
-	}*/
 
-	err = model.UserEditV3(j)
+	var u model.User
+	err = u.UserEdit(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit, core.ERROR_MESSAGE_UserEdit, nil, err)
 		return
@@ -270,7 +254,7 @@ func UserEdit(c *gin.Context)  {
 // Delete User
 // 删除用户
 func UserDelete(c *gin.Context)  {
-	var j model.ApiUserDeleteV2
+	var j model.ApiUserDelete
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserDelete_Bind, core.ERROR_MESSAGE_UserDelete_Bind, nil, err)
@@ -290,7 +274,8 @@ func UserDelete(c *gin.Context)  {
 		return
 	}
 
-	err := model.UserDeleteV2(ids)
+	var u model.User
+	err := u.UserDelete(ids)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserDelete, core.ERROR_MESSAGE_UserDelete, nil, err)
 		return
@@ -304,7 +289,7 @@ func UserDelete(c *gin.Context)  {
 // Update user information
 // 更新用户信息
 func UserUpdateInformation(c *gin.Context)  {
-	var j model.ApiUserUpdateInformationV1
+	var j model.ApiUserUpdateInformation
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -320,7 +305,8 @@ func UserUpdateInformation(c *gin.Context)  {
 	}
 
 	// Get current user id
-	j.ID, err = model.User_GetUserIdByRequest(c)
+	var us model.User
+	j.ID, err = us.User_GetUserIdByRequest(c)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Get_current_user_id, core.ERROR_MESSAGE_Get_current_user_information, nil, err)
 		return
@@ -332,7 +318,8 @@ func UserUpdateInformation(c *gin.Context)  {
 		return
 	}*/
 
-	err = model.UserUpdateInformationV1(j)
+	var u model.User
+	err = u.UserUpdateInformation(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation, core.ERROR_MESSAGE_Internal, nil, err)
 		return
