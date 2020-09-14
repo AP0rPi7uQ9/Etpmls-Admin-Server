@@ -113,7 +113,7 @@ type ApiUserGetAll struct {
 }
 func (this *User) UserGetAll(c *gin.Context) interface{} {
 	// 重写ApiUserGetAllV2的Roles字段，防止泄露隐私字段信息
-	type Role ApiRoleGetAllV2
+	type Role ApiRoleGetAll
 	type User struct {
 		ApiUserGetAll
 		Roles []Role `gorm:"many2many:role_users" json:"roles"`
@@ -380,6 +380,7 @@ func (this *User) UserGetToken(userId uint, username string) (string, error) {
 
 
 // 通过Token获取当前用户
+// TODO 应该缓存token，把token时间设置定值
 type ApiUserGetCurrent struct {
 	ID        uint `json:"id"`
 	CreatedAt time.Time	`json:"-"`
@@ -514,6 +515,7 @@ func (this *User) User_GetUserByToken(token string) (u User, err error) {
 	return data, nil
 }
 
+
 // 根据请求信息获取用户
 func (this *User) User_GetUserByRequest(c *gin.Context) (u User, err error) {
 	token, err := core.GetToken(c)
@@ -527,6 +529,7 @@ func (this *User) User_GetUserByRequest(c *gin.Context) (u User, err error) {
 	return u, err
 }
 
+
 // 根据请求信息获取用户id
 func (this *User) User_GetUserIdByRequest(c *gin.Context) (id uint, err error) {
 	token, err := core.GetToken(c)
@@ -539,6 +542,7 @@ func (this *User) User_GetUserIdByRequest(c *gin.Context) (id uint, err error) {
 	}
 	return id, err
 }
+
 
 // 根据token获取用户id
 func (this *User) User_GetUserIdByToken(token string) (id uint, err error) {

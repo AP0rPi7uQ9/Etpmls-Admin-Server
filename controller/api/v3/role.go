@@ -13,7 +13,7 @@ import (
 // Create Role
 // 创建角色
 func RoleCreate(c *gin.Context)  {
-	var j model.ApiRoleCreateV2
+	var j model.ApiRoleCreate
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -36,7 +36,8 @@ func RoleCreate(c *gin.Context)  {
 		return
 	}
 
-	err = model.RoleCreateV2(j)
+	var r model.Role
+	err = r.RoleCreate(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_RoleCreate_ROLE_CREATE, core.ERROR_MESSAGE_RoleCreate_ROLE_CREATE, nil, err)
 		return
@@ -49,7 +50,8 @@ func RoleCreate(c *gin.Context)  {
 // Get all characters
 // 获取所有的角色
 func RoleGetAll(c *gin.Context)  {
-	data, count := model.RoleGetAllV2(c)
+	var r model.Role
+	data, count := r.RoleGetAll(c)
 
 	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_RoleGetAll, core.SUCCESS_MESSAGE_RoleGetAll, gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
 	return
@@ -58,7 +60,7 @@ func RoleGetAll(c *gin.Context)  {
 // Modify role
 // 修改角色
 func RoleEdit(c *gin.Context)  {
-	var j model.ApiRoleEditV2
+	var j model.ApiRoleEdit
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -81,7 +83,8 @@ func RoleEdit(c *gin.Context)  {
 		return
 	}
 
-	err = model.RoleEditV2(j)
+	var r model.Role
+	err = r.RoleEdit(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_RoleEdit, core.ERROR_MESSAGE_RoleEdit, nil, err)
 		return
@@ -95,7 +98,7 @@ func RoleEdit(c *gin.Context)  {
 // Delete roles (multiple can be deleted at the same time)
 // 删除角色(可以同时删除多个)
 func RoleDelete(c *gin.Context)  {
-	var j model.ApiRoleDeleteV2
+	var j model.ApiRoleDelete
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_RoleDelete_Bind, core.ERROR_MESSAGE_RoleDelete_Bind, nil, err)
@@ -116,7 +119,8 @@ func RoleDelete(c *gin.Context)  {
 		return
 	}
 
-	err := model.RoleDeleteV2(ids)
+	var r model.Role
+	err := r.RoleDelete(ids)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_RoleDelete, core.ERROR_MESSAGE_RoleDelete, nil, err)
 		return

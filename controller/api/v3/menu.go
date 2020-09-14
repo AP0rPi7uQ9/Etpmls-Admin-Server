@@ -2,52 +2,18 @@ package v3
 
 import (
 	"Etpmls-Admin-Server/core"
-	"Etpmls-Admin-Server/library"
 	"Etpmls-Admin-Server/model"
-	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"net/http"
-	"os"
 )
 
+// Get all menu
+// 获取全部菜单
 func MenuGetAll(c *gin.Context)  {
-	var (
-		ctx []byte
-		err error
-	)
-
-	if library.Config.App.Cache {
-		ctx, err = library.Redis.Get(library.RedisCtx, core.Cache_MenuGetAll).Bytes()
-		if err != nil {
-			ctx, err = ioutil.ReadFile("./storage/menu/menu.json")
-			if err != nil {
-				core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_GET_MENU_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_GET_MENU_FAILED, nil, err)
-				return
-			}
-			// Save menu
-			// 储存菜单
-			err = library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, ctx, 0).Err()
-			if err != nil {
-				core.LogError.Output(err)
-				err = library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
-				if err != nil {
-					core.LogError.Output(err)
-				}
-			}
-		}
-	} else {
-		ctx, err = ioutil.ReadFile("./storage/menu/menu.json")
-		if err != nil {
-			core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_GET_MENU_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_GET_MENU_FAILED, nil, err)
-			return
-		}
-	}
-
-	var j interface{}
-	err = json.Unmarshal(ctx, &j)
+	var m model.Menu
+	j, err := m.MenuGetAll()
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_JSON_UNMARSHAL_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_JSON_UNMARSHAL_FAILED, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuGetCurrent_GET_MENU_FAILED, core.ERROR_MESSAGE_MenuGetCurrent_GET_MENU_FAILED, nil, err)
 		return
 	}
 
@@ -55,8 +21,11 @@ func MenuGetAll(c *gin.Context)  {
 	return
 }
 
+
+// Create Menu
+// 创建菜单
 func MenuCreate(c *gin.Context)  {
-	var j model.ApiMenuCreateV2
+	var j model.ApiMenuCreate
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -64,47 +33,13 @@ func MenuCreate(c *gin.Context)  {
 		return
 	}
 
-	// Move files
-	// 移动文件
-	err := os.Rename("storage/menu/menu.json", "storage/menu/menu.json.bak")
+	var m model.Menu
+	err := m.MenuCreate(j)
 	if err != nil {
-		core.LogError.AutoOutputDebug("备份菜单文件失败！", err)
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuCreate_Move_failed, core.ERROR_MESSAGE_MenuCreate_Move_failed, nil, err)
-		return
-	}
-
-	// Write file
-	// 写入文件
-	var s = []byte(j.Menu)
-	err = ioutil.WriteFile("storage/menu/menu.json", s, 0666)
-	if err != nil {
-		core.LogError.AutoOutputDebug("写入菜单文件失败！", err)
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_MenuCreate_Write, core.ERROR_MESSAGE_MenuCreate_Write, nil, err)
-
-		// 还原历史菜单
-		err = os.Rename("storage/menu/menu.json.bak", "storage/menu/menu.json")
-		if err != nil {
-			core.LogError.AutoOutputDebug("备份菜单文件还原失败！", err)
-		}
-
 		return
 	}
 
-	// Cache
-	// 缓存
-	if library.Config.App.Cache {
-		// Save menu
-		// 储存菜单
-		err := library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, s, 0).Err()
-		if err != nil {
-			core.LogError.Output(err)
-			err = library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
-			if err != nil {
-				core.LogError.Output(err)
-			}
-		}
-	}
-
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_MenuCreate, core.SUCCESS_MESSAGE_MenuCreate, j)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_MenuCreate, core.SUCCESS_MESSAGE_MenuCreate, nil)
 	return
 }

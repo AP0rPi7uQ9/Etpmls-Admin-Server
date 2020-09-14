@@ -23,7 +23,7 @@ type Permission struct {
 
 // Create Permission
 // 创建权限
-type ApiPermissionCreateV2 struct {
+type ApiPermissionCreate struct {
 	ID        uint `json:"-"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
@@ -34,8 +34,8 @@ type ApiPermissionCreateV2 struct {
 	Remark string `json:"remark"`
 	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
-func PermissionCreateV2(j ApiPermissionCreateV2) (error) {
-	type Permission ApiPermissionCreateV2
+func (this *Permission)PermissionCreate(j ApiPermissionCreate) (error) {
+	type Permission ApiPermissionCreate
 	form := Permission(j)
 
 	// []string -> string
@@ -50,9 +50,10 @@ func PermissionCreateV2(j ApiPermissionCreateV2) (error) {
 	return nil
 }
 
+
 // Get all Permission
 // 获取所有的权限
-type ApiPermissionGetAllV2 struct {
+type ApiPermissionGetAll struct {
 	ID        uint `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"-"`
@@ -63,8 +64,8 @@ type ApiPermissionGetAllV2 struct {
 	Remark string `json:"remark"`
 	Roles []Role `gorm:"many2many:role_permissions" json:"roles"`
 }
-func PermissionGetAllV2(c *gin.Context) (interface{}, int64) {
-	type Permission ApiPermissionGetAllV2
+func (this *Permission) PermissionGetAll(c *gin.Context) (interface{}, int64) {
+	type Permission ApiPermissionGetAll
 	var data []Permission
 
 	limit, offset := CommonGetPageByQuery(c)
@@ -78,9 +79,10 @@ func PermissionGetAllV2(c *gin.Context) (interface{}, int64) {
 	return data, count
 }
 
+
 // Modify Permission
 // 修改权限
-type ApiPermissionEditV2 struct {
+type ApiPermissionEdit struct {
 	ID        uint `json:"id" binding:"required" validate:"min=1"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"-"`
@@ -91,9 +93,8 @@ type ApiPermissionEditV2 struct {
 	Remark string `json:"remark"`
 	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
-
-func PermissionEditV2(j ApiPermissionEditV2) (error) {
-	type Permission ApiPermissionEditV2
+func (this *Permission) PermissionEdit(j ApiPermissionEdit) (error) {
+	type Permission ApiPermissionEdit
 	form := Permission(j)
 
 	// []string -> string
@@ -110,14 +111,14 @@ func PermissionEditV2(j ApiPermissionEditV2) (error) {
 
 // Delete Permission (allow multiple deletions at the same time)
 // 删除权限（允许同时删除多个）
-type ApiPermissionDeleteV2 struct {
+type ApiPermissionDelete struct {
 	ID uint `json:"-"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt *time.Time `json:"-"`
 	Permissions []Permission `json:"permissions" binding:"required" validate:"min=1"`
 }
-func PermissionDeleteV2(ids []uint) (err error) {
+func (this *Permission) PermissionDelete(ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var p []Permission
 		database.DB.Where("id IN ?", ids).Find(&p)

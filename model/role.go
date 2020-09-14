@@ -21,7 +21,7 @@ type Role struct {
 
 // Create Role
 // 创建角色
-type ApiRoleCreateV2 struct {
+type ApiRoleCreate struct {
 	ID        uint `json:"-"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
@@ -30,8 +30,8 @@ type ApiRoleCreateV2 struct {
 	Remark string `json:"remark"`
 	Permissions []Permission `gorm:"many2many:role_permissions;" json:"permissions"`
 }
-func RoleCreateV2(j ApiRoleCreateV2) (error) {
-	type Role ApiRoleCreateV2
+func (this *Role) RoleCreate(j ApiRoleCreate) (error) {
+	type Role ApiRoleCreate
 	form := Role(j)
 
 	// Insert Data
@@ -43,9 +43,10 @@ func RoleCreateV2(j ApiRoleCreateV2) (error) {
 	return nil
 }
 
+
 // Modify role
 // 修改角色
-type ApiRoleEditV2 struct {
+type ApiRoleEdit struct {
 	ID        uint `json:"id" binding:"required" validate:"min=1"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"-"`
@@ -54,8 +55,8 @@ type ApiRoleEditV2 struct {
 	Remark string `json:"remark"`
 	Permissions []Permission `gorm:"many2many:role_permissions;" json:"permissions"`
 }
-func RoleEditV2(j ApiRoleEditV2) (error) {
-	type Role ApiRoleEditV2
+func (this *Role) RoleEdit(j ApiRoleEdit) (error) {
+	type Role ApiRoleEdit
 	form := Role(j)
 	result := database.DB.Save(&form)
 	if result.Error != nil {
@@ -65,9 +66,10 @@ func RoleEditV2(j ApiRoleEditV2) (error) {
 	return nil
 }
 
+
 // Get all role
 // 获取全部角色
-type ApiRoleGetAllV2 struct {
+type ApiRoleGetAll struct {
 	ID        uint `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"-"`
@@ -76,8 +78,8 @@ type ApiRoleGetAllV2 struct {
 	Remark string `json:"remark"`
 	Permissions []Permission `gorm:"many2many:role_permissions;" json:"permissions"`
 }
-func RoleGetAllV2(c *gin.Context) (interface{}, int64) {
-	type Role ApiRoleGetAllV2
+func (this *Role) RoleGetAll(c *gin.Context) (interface{}, int64) {
+	type Role ApiRoleGetAll
 	var data []Role
 
 	limit, offset := CommonGetPageByQuery(c)
@@ -91,16 +93,17 @@ func RoleGetAllV2(c *gin.Context) (interface{}, int64) {
 	return data, count
 }
 
+
 // Delete roles (allow multiple deletions at the same time)
 // 删除角色（允许同时删除多个）
-type ApiRoleDeleteV2 struct {
+type ApiRoleDelete struct {
 	ID uint `json:"-"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt *time.Time `json:"-"`
 	Roles []Role `json:"roles" binding:"required" validate:"min=1"`
 }
-func RoleDeleteV2(ids []uint) (err error) {
+func (this *Role) RoleDelete(ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var r []Role
 		database.DB.Where("id IN ?", ids).Find(&r)

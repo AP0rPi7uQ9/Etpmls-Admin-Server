@@ -11,7 +11,7 @@ import (
 // Create Permission
 // 创建允许
 func PermissionCreate(c *gin.Context)  {
-	var j model.ApiPermissionCreateV2
+	var j model.ApiPermissionCreate
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -26,8 +26,8 @@ func PermissionCreate(c *gin.Context)  {
 		return
 	}
 
-
-	err = model.PermissionCreateV2(j)
+	var p model.Permission
+	err = p.PermissionCreate(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionCreate, core.ERROR_MESSAGE_PermissionCreate, nil, err)
 		return
@@ -40,7 +40,8 @@ func PermissionCreate(c *gin.Context)  {
 // Get all Permission
 // 获取所有的权限
 func PermissionGetAll(c *gin.Context)  {
-	data, count := model.PermissionGetAllV2(c)
+	var p model.Permission
+	data, count := p.PermissionGetAll(c)
 
 	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_PermissionGetAll, core.SUCCESS_MESSAGE_PermissionGetAll, gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
 	return
@@ -49,7 +50,7 @@ func PermissionGetAll(c *gin.Context)  {
 // Modify Permission
 // 修改权限
 func PermissionEdit(c *gin.Context)  {
-	var j model.ApiPermissionEditV2
+	var j model.ApiPermissionEdit
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -64,7 +65,8 @@ func PermissionEdit(c *gin.Context)  {
 		return
 	}
 
-	err = model.PermissionEditV2(j)
+	var p model.Permission
+	err = p.PermissionEdit(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionEdit, core.ERROR_MESSAGE_PermissionEdit, nil, err)
 		return
@@ -78,7 +80,7 @@ func PermissionEdit(c *gin.Context)  {
 // Delete Permission (multiple can be deleted at the same time)
 // 删除权限(可以同时删除多个)
 func PermissionDelete(c *gin.Context)  {
-	var j model.ApiPermissionDeleteV2
+	var j model.ApiPermissionDelete
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionDelete_Bind, core.ERROR_MESSAGE_PermissionDelete_Bind, nil, err)
@@ -90,7 +92,8 @@ func PermissionDelete(c *gin.Context)  {
 		ids = append(ids, v.ID)
 	}
 
-	err := model.PermissionDeleteV2(ids)
+	var p model.Permission
+	err := p.PermissionDelete(ids)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionDelete, core.ERROR_MESSAGE_PermissionDelete, nil, err)
 		return
