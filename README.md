@@ -32,10 +32,9 @@ And configure them
 
 并且配置它们
 
-4
-```shell script
-go mod vendor
-```
+4. ```
+   go mod vendor
+   ```
 
 
 ## Run 运行
