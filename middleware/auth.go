@@ -82,6 +82,7 @@ func RoleCheck() gin.HandlerFunc {
 	}
 }
 
+
 func PermissionCheck(c *gin.Context, idStr string) (b bool, err error) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
