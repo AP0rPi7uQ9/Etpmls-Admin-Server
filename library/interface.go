@@ -1,8 +1,11 @@
 package library
 
+import "time"
+
 var (
 	Jwt_Token = Interface_Jwt(&JwtGo{MySigningKey: []byte(Config.App.Key)})
 	I18n = Interface_I18n(&Go_i18n{})
+	Cache = Interface_Cache(&Redis{})
 )
 
 
@@ -20,4 +23,16 @@ type Interface_Jwt interface {
 // i18n 接口
 type Interface_I18n interface {
 	Translate (ctx string, language string) string
+}
+
+
+// Cache interface
+// 缓存接口
+type Interface_Cache interface {
+	GetString (key string) (string, error)
+	SetString (key string, value string, time time.Duration)
+	DeleteString (list ...string)
+	GetHash (key string, field string) (string, error)
+	SetHash (key string, value map[string]string)
+	DeleteHash (key string, list ...string)
 }

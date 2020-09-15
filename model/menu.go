@@ -51,7 +51,7 @@ func (this *Menu) MenuCreate(j ApiMenuCreate) (error) {
 	// Delete Cache
 	// 删除缓存
 	if library.Config.App.Cache {
-		library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll)
+		library.Cache.DeleteString(core.Cache_MenuGetAll)
 	}
 
 	return nil
@@ -70,7 +70,7 @@ func (this *Menu) MenuGetAll() (interface{}, error) {
 func (this *Menu) menu_GetAll_Cache() (interface{}, error) {
 	// Get the menu from cache
 	// 从缓存中获取menu
-	ctx, err := library.Redis.Get(library.RedisCtx, core.Cache_MenuGetAll).Bytes()
+	ctx, err := library.Cache.GetString(core.Cache_MenuGetAll)
 	if err != nil {
 		if err == redis.Nil {
 			return this.menu_GetAll_NoCache()
@@ -80,14 +80,10 @@ func (this *Menu) menu_GetAll_Cache() (interface{}, error) {
 	}
 
 	var j interface{}
-	err = json.Unmarshal(ctx, &j)
+	err = json.Unmarshal([]byte(ctx), &j)
 	if err != nil {
 		core.LogError.Output(err)
-		err2 := library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
-		if err2 != nil {
-			core.LogError.Output(err2)
-			return nil, err
-		}
+		library.Cache.DeleteString(core.Cache_MenuGetAll)
 		return nil, err
 	}
 	return j, nil
@@ -99,16 +95,7 @@ func (this *Menu) menu_GetAll_NoCache() (interface{}, error) {
 	}
 	// Save menu
 	// 储存菜单
-	err = library.Redis.Set(library.RedisCtx, core.Cache_MenuGetAll, ctx, 0).Err()
-	if err != nil {
-		core.LogError.Output(err)
-		err2 := library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll).Err()
-		if err2 != nil {
-			core.LogError.Output(err2)
-			return nil, err2
-		}
-		return nil, err
-	}
+	library.Cache.SetString(core.Cache_MenuGetAll, string(ctx), 0)
 
 	var j interface{}
 	err = json.Unmarshal(ctx, &j)

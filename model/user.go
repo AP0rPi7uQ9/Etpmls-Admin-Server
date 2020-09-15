@@ -204,10 +204,7 @@ func (this *User) UserEdit(j ApiUserEdit) (err error) {
 	})
 
 	if library.Config.App.Cache {
-		err := library.Redis.HDel(library.RedisCtx, core.Cache_UserGetCurrent, strconv.Itoa(int(j.ID))).Err()
-		if err != nil {
-			core.LogError.Output(err)
-		}
+		library.Cache.DeleteHash(core.Cache_UserGetCurrent, strconv.Itoa(int(j.ID)))
 	}
 
 	return err
@@ -248,10 +245,7 @@ func (this *User) UserDelete(ids []uint) (err error) {
 		for _, v := range ids {
 			tmp = append(tmp, strconv.Itoa(int(v)))
 		}
-		err := library.Redis.HDel(library.RedisCtx, core.Cache_UserGetCurrent, strings.Join(tmp, " ")).Err()
-		if err != nil {
-			core.LogError.Output(err)
-		}
+		library.Cache.DeleteHash(core.Cache_UserGetCurrent, strings.Join(tmp, " "))
 	}
 
 	return err
@@ -315,10 +309,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 	})
 
 	if library.Config.App.Cache {
-		err := library.Redis.HDel(library.RedisCtx, core.Cache_UserGetCurrent, strconv.Itoa(int(j.ID))).Err()
-		if err != nil {
-			core.LogError.Output(err)
-		}
+		library.Cache.DeleteHash(core.Cache_UserGetCurrent, strconv.Itoa(int(j.ID)))
 	}
 
 	return err
@@ -440,12 +431,9 @@ func (this *User) user_GetCurrent_NotCache(c *gin.Context) (interface{}, error) 
 		if err != nil {
 			core.LogError.Output(err)
 		} else {
-			var m = make(map[string]interface{})
+			var m = make(map[string]string)
 			m[strconv.Itoa(int(u.ID))] = string(b)
-			err = library.Redis.HSet(library.RedisCtx, core.Cache_UserGetCurrent, m).Err()
-			if err != nil {
-				core.LogError.Output(err)
-			}
+			library.Cache.SetHash(core.Cache_UserGetCurrent, m)
 		}
 	}
 
@@ -457,7 +445,7 @@ func (this *User) user_GetCurrent_Cache(c *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	b, err := library.Redis.HGet(library.RedisCtx, core.Cache_UserGetCurrent, strconv.Itoa(int(id))).Bytes()
+	str, err := library.Cache.GetHash(core.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	if err != nil {
 		if err == redis.Nil {
 			return this.user_GetCurrent_NotCache(c)
@@ -466,13 +454,9 @@ func (this *User) user_GetCurrent_Cache(c *gin.Context) (interface{}, error) {
 	}
 
 	var userApi ApiUserGetCurrent
-	err = json.Unmarshal(b, &userApi)
+	err = json.Unmarshal([]byte(str), &userApi)
 	if err != nil {
-		err := library.Redis.HDel(library.RedisCtx, core.Cache_UserGetCurrent, strconv.Itoa(int(id))).Err()
-		if err != nil {
-			core.LogError.Output(err)
-			return this.user_GetCurrent_NotCache(c)
-		}
+		library.Cache.DeleteHash(core.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	}
 
 	return userApi, nil
