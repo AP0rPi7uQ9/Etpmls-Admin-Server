@@ -17,9 +17,9 @@ func InitRedis()  {
 	}
 
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     Config.Redis.Address,
-		Password: Config.Redis.Password, // no password set
-		DB:       Config.Redis.DB,  // use default DB
+		Addr:     Config.Cache.Address,
+		Password: Config.Cache.Password, // no password set
+		DB:       Config.Cache.DB,  // use default DB
 	})
 
 	_, err := RedisClient.Ping(context.TODO()).Result()

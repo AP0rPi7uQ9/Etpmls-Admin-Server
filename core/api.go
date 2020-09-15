@@ -21,10 +21,10 @@ const (
 
 
 var (
-	api_code = library.Config.App.Api.Field.Code
-	api_status = library.Config.App.Api.Field.Status
-	api_message = library.Config.App.Api.Field.Message
-	api_data = library.Config.App.Api.Field.Data
+	api_code = library.Config.Field.Api.Code
+	api_status = library.Config.Field.Api.Status
+	api_message = library.Config.Field.Api.Message
+	api_data = library.Config.Field.Api.Data
 )
 
 
@@ -33,7 +33,7 @@ var (
 func JsonError(c *gin.Context, httpStatusCode int, code interface{}, message string, data interface{}, err error)  {
 	// If enabled, use HTTP CODE instead of system default CODE
 	// 如果开启使用HTTP CODE 代替系统的默认CODE
-	if library.Config.App.Api.UseHttpCode == true {
+	if library.Config.App.UseHttpCode == true {
 		code = httpStatusCode
 	}
 
@@ -54,7 +54,7 @@ func JsonError(c *gin.Context, httpStatusCode int, code interface{}, message str
 func JsonSuccess(c *gin.Context, httpStatusCode int, code interface{}, message string, data interface{})  {
 	// If enabled, use HTTP CODE instead of system default CODE
 	// 如果开启使用HTTP CODE 代替系统的默认CODE
-	if library.Config.App.Api.UseHttpCode == true {
+	if library.Config.App.UseHttpCode == true {
 		code = httpStatusCode
 	}
 

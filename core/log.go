@@ -61,7 +61,7 @@ type OutputLog struct {
 func (o OutputLog) Output (info interface{}) {
 	switch o.Level {
 	case PanicLevel:
-		switch library.Config.App.Log.Panic {
+		switch library.Config.Log.Panic {
 		case LOG_MODE_ONLY:
 			library.Log.Panic(info)
 		case CONSOLE_MODE_ONLY:
@@ -75,7 +75,7 @@ func (o OutputLog) Output (info interface{}) {
 		}
 
 	case FatalLevel:
-		switch library.Config.App.Log.Fatal {
+		switch library.Config.Log.Fatal {
 		case LOG_MODE_ONLY:
 			library.Log.Fatal(info)
 		case CONSOLE_MODE_ONLY:
@@ -89,7 +89,7 @@ func (o OutputLog) Output (info interface{}) {
 		}
 
 	case ErrorLevel:
-		switch library.Config.App.Log.Error {
+		switch library.Config.Log.Error {
 		case LOG_MODE_ONLY:
 			library.Log.Error(info)
 		case CONSOLE_MODE_ONLY:
@@ -103,7 +103,7 @@ func (o OutputLog) Output (info interface{}) {
 		}
 
 	case WarnLevel:
-		switch library.Config.App.Log.Warning {
+		switch library.Config.Log.Warning {
 		case LOG_MODE_ONLY:
 			library.Log.Warning(info)
 		case CONSOLE_MODE_ONLY:
@@ -117,7 +117,7 @@ func (o OutputLog) Output (info interface{}) {
 		}
 
 	case InfoLevel:
-		switch library.Config.App.Log.Info {
+		switch library.Config.Log.Info {
 		case LOG_MODE_ONLY:
 			library.Log.Info(info)
 		case CONSOLE_MODE_ONLY:
@@ -131,7 +131,7 @@ func (o OutputLog) Output (info interface{}) {
 		}
 
 	case DebugLevel:
-		switch library.Config.App.Log.Debug {
+		switch library.Config.Log.Debug {
 		case LOG_MODE_ONLY:
 			library.Log.Debug(info)
 		case CONSOLE_MODE_ONLY:
@@ -145,7 +145,7 @@ func (o OutputLog) Output (info interface{}) {
 		}
 
 	case TraceLevel:
-		switch library.Config.App.Log.Trace {
+		switch library.Config.Log.Trace {
 		case LOG_MODE_ONLY:
 			library.Log.Trace(info)
 		case CONSOLE_MODE_ONLY:
@@ -173,7 +173,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 
 	switch o.Level {
 	case PanicLevel:
-		switch library.Config.App.Log.Panic {
+		switch library.Config.Log.Panic {
 		case LOG_MODE_ONLY:
 			library.Log.Panic(m)
 		case CONSOLE_MODE_ONLY:
@@ -187,7 +187,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		}
 
 	case FatalLevel:
-		switch library.Config.App.Log.Fatal {
+		switch library.Config.Log.Fatal {
 		case LOG_MODE_ONLY:
 			library.Log.Fatal(m)
 		case CONSOLE_MODE_ONLY:
@@ -201,7 +201,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		}
 
 	case ErrorLevel:
-		switch library.Config.App.Log.Error {
+		switch library.Config.Log.Error {
 		case LOG_MODE_ONLY:
 			library.Log.Error(m)
 		case CONSOLE_MODE_ONLY:
@@ -215,7 +215,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		}
 
 	case WarnLevel:
-		switch library.Config.App.Log.Warning {
+		switch library.Config.Log.Warning {
 		case LOG_MODE_ONLY:
 			library.Log.Warning(m)
 		case CONSOLE_MODE_ONLY:
@@ -229,7 +229,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		}
 
 	case InfoLevel:
-		switch library.Config.App.Log.Info {
+		switch library.Config.Log.Info {
 		case LOG_MODE_ONLY:
 			library.Log.Info(m)
 		case CONSOLE_MODE_ONLY:
@@ -243,7 +243,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		}
 
 	case DebugLevel:
-		switch library.Config.App.Log.Debug {
+		switch library.Config.Log.Debug {
 		case LOG_MODE_ONLY:
 			library.Log.Debug(m)
 		case CONSOLE_MODE_ONLY:
@@ -257,7 +257,7 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		}
 
 	case TraceLevel:
-		switch library.Config.App.Log.Trace {
+		switch library.Config.Log.Trace {
 		case LOG_MODE_ONLY:
 			library.Log.Trace(m)
 		case CONSOLE_MODE_ONLY:

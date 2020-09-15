@@ -53,7 +53,7 @@ func RoleGetAll(c *gin.Context)  {
 	var r model.Role
 	data, count := r.RoleGetAll(c)
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Get"), gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Get"), gin.H{"data": data, library.Config.Field.Pagination.Count: count})
 	return
 }
 

@@ -129,7 +129,7 @@ func (this *User) UserGetAll(c *gin.Context) interface{} {
 
 	database.DB.Model(&User{}).Preload("Roles").Where("username " + database.FUZZY_SEARCH + " ?", "%"+ search +"%").Count(&count).Limit(limit).Offset(offset).Find(&data)
 
-	return gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count}
+	return gin.H{"data": data, library.Config.Field.Pagination.Count: count}
 }
 
 
@@ -360,7 +360,7 @@ func (this *User) UserVerify(username string, password string) (id uint, unm str
 func (this *User) UserGetToken(userId uint, username string) (string, error) {
 	return library.Jwt_Token.CreateToken(&jwt.StandardClaims{
 		Id: strconv.Itoa(int(userId)),	// 用户ID
-		ExpiresAt: time.Now().Add(time.Hour * 12).Unix(),	// 过期时间 - 12个小时
+		ExpiresAt: time.Now().Add(time.Second * library.Config.App.TokenExpirationTime).Unix(),	// 过期时间 - 12个小时
 		Issuer:    username,	// 发行者
 	})
 
@@ -368,7 +368,6 @@ func (this *User) UserGetToken(userId uint, username string) (string, error) {
 
 
 // 通过Token获取当前用户
-// TODO 应该缓存token，把token时间设置定值
 type ApiUserGetCurrent struct {
 	ID        uint `json:"id"`
 	CreatedAt time.Time	`json:"-"`

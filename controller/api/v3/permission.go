@@ -43,7 +43,7 @@ func PermissionGetAll(c *gin.Context)  {
 	var p model.Permission
 	data, count := p.PermissionGetAll(c)
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Get"), gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Get"), gin.H{"data": data, library.Config.Field.Pagination.Count: count})
 	return
 }
 

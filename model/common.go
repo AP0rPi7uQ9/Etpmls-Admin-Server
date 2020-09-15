@@ -12,10 +12,10 @@ func Common_GetPageByQuery(c *gin.Context) (limit int, offset int) {
 	limit = -1
 	offset = -1
 
-	pn := c.Query(library.Config.App.Api.Pagination.Field.PageNo)
+	pn := c.Query(library.Config.Field.Pagination.PageNo)
 	pageNo, err1 := strconv.Atoi(pn)
 
-	ps := c.Query(library.Config.App.Api.Pagination.Field.PageSize)
+	ps := c.Query(library.Config.Field.Pagination.PageSize)
 	pageSize, err2 := strconv.Atoi(ps)
 
 	if err1 == nil && err2 == nil && pageSize > 0 && pageNo > 0 {

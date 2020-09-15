@@ -25,7 +25,7 @@ func InitLogrus() {
 	}
 
 	// Only log the warning severity or above.
-	level, err := logrus.ParseLevel(Config.App.Log.Level)
+	level, err := logrus.ParseLevel(Config.Log.Level)
 	if err != nil {
 		level = logrus.WarnLevel
 		Log.Warning("Set Log Level Failed!")

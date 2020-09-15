@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 type configuration struct {
@@ -16,32 +17,18 @@ type configuration struct {
 		Register bool
 		Key string
 		Cache bool
-		Log struct {
-			Level string
-			Panic	int
-			Fatal	int
-			Error	int
-			Warning	int
-			Info	int
-			Debug	int
-			Trace	int
-		}
-		Api struct{
-			UseHttpCode bool	`yaml:"use_http_code"`
-			Field struct{
-				Code string
-				Message string
-				Status string
-				Data string
-			}
-			Pagination struct {
-				Field struct {
-					PageNo string `yaml:"page_no"`
-					PageSize string `yaml:"page_size"`
-					Count string
-				}
-			}
-		}
+		TokenExpirationTime time.Duration	`yaml:"token-expiration-time"`
+		UseHttpCode bool	`yaml:"use-http-code"`
+	}
+	Log struct {
+		Level string
+		Panic	int
+		Fatal	int
+		Error	int
+		Warning	int
+		Info	int
+		Debug	int
+		Trace	int
 	}
 	Database struct{
 		Host string
@@ -51,10 +38,23 @@ type configuration struct {
 		Password string
 		Prefix string
 	}
-	Redis struct{
+	Cache struct{
 		Address string
 		Password string
 		DB int
+	}
+	Field struct{
+		Api struct{
+			Code string
+			Message string
+			Status string
+			Data string
+		}
+		Pagination struct {
+			PageNo string `yaml:"page_no"`
+			PageSize string `yaml:"page_size"`
+			Count string
+		}
 	}
 	Module struct{
 		Name []string
