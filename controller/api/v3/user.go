@@ -15,7 +15,7 @@ func UserRegister(c *gin.Context)  {
 	// Registration is not enabled
 	// 注册功能未开启
 	if library.Config.App.Register == false {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_RegistrationFunctionClosed, nil, nil)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_RegistrationClosed, nil, nil)
 		return
 	}
 

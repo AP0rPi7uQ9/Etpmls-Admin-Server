@@ -16,7 +16,7 @@ const (
 const (
 	ERROR_MESSAGE_Login = "登录失败！"
 	ERROR_MESSAGE_Register = "注册失败！"
-	ERROR_MESSAGE_RegistrationFunctionClosed = "管理员关闭了注册功能！"
+	ERROR_MESSAGE_RegistrationClosed = "管理员关闭了注册功能！"
 	ERROR_MESSAGE_Logout = "登出失败！"
 	ERROR_MESSAGE_Create = "创建失败！"
 	ERROR_MESSAGE_Edit = "更新失败！"
@@ -40,6 +40,7 @@ const (
 )
 
 // Success Message
+// 成功信息
 const (
 	SUCCESS_MESSAGE_Login = "登录成功！"
 	SUCCESS_MESSAGE_Register = "注册成功！"
