@@ -13,11 +13,11 @@ func MenuGetAll(c *gin.Context)  {
 	var m model.Menu
 	j, err := m.MenuGetAll()
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Get, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Get"), nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Get, j)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Get"), j)
 	return
 }
 
@@ -29,17 +29,17 @@ func MenuCreate(c *gin.Context)  {
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_BindData"), nil, err)
 		return
 	}
 
 	var m model.Menu
 	err := m.MenuCreate(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Create, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Create"), nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Create, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Create"), nil)
 	return
 }

@@ -11,6 +11,7 @@ func InitCors(router *gin.Engine)  {
 	config.AllowHeaders = append(config.AllowHeaders, "X-Token")
 	config.AllowHeaders = append(config.AllowHeaders, "token")
 	config.AllowHeaders = append(config.AllowHeaders, "Token")
+	config.AllowHeaders = append(config.AllowHeaders, "language")
 	router.Use(cors.New(config))
 	return
 }

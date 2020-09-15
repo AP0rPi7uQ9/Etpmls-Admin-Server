@@ -48,6 +48,12 @@ func (this *Menu) MenuCreate(j ApiMenuCreate) (error) {
 		return err
 	}
 
+	// Delete Cache
+	// 删除缓存
+	if library.Config.App.Cache {
+		library.Redis.Del(library.RedisCtx, core.Cache_MenuGetAll)
+	}
+
 	return nil
 }
 

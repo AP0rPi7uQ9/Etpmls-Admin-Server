@@ -5,33 +5,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 // Error Code
 // 错误码
 const (
 	ERROR_Code = "400000"
 )
 
-// Error Message
-// 错误信息
-const (
-	ERROR_MESSAGE_Login = "登录失败！"
-	ERROR_MESSAGE_Register = "注册失败！"
-	ERROR_MESSAGE_RegistrationClosed = "管理员关闭了注册功能！"
-	ERROR_MESSAGE_Logout = "登出失败！"
-	ERROR_MESSAGE_Create = "创建失败！"
-	ERROR_MESSAGE_Edit = "更新失败！"
-	ERROR_MESSAGE_Get = "获取失败！"
-	ERROR_MESSAGE_Delete = "删除失败！"
-	ERROR_MESSAGE_Upload = "上传失败！"
-	ERROR_MESSAGE_BindData = "提交的参数存在错误"
-	ERROR_MESSAGE_Validate = "验证失败"
-	ERROR_MESSAGE_PermissionDenied = "权限不足"
-	ERROR_MESSAGE_DuplicateUserName = "当前用户名已存在！"
-	ERROR_MESSAGE_DuplicateRoleName = "当前角色名已存在！"
-	ERROR_MESSAGE_ProhibitOperationOfAdministratorUsers = "禁止操作管理员用户！"
-	ERROR_MESSAGE_GetToken = "获取令牌失败！"
-	ERROR_MESSAGE_TokenVerificationFailed = "令牌校验失败！"
-)
 
 // Success Code
 // 成功码
@@ -39,18 +19,6 @@ const (
 	SUCCESS_Code = "200000"
 )
 
-// Success Message
-// 成功信息
-const (
-	SUCCESS_MESSAGE_Login = "登录成功！"
-	SUCCESS_MESSAGE_Register = "注册成功！"
-	SUCCESS_MESSAGE_Logout = "登出成功！"
-	SUCCESS_MESSAGE_Create = "创建成功！"
-	SUCCESS_MESSAGE_Edit = "更新成功！"
-	SUCCESS_MESSAGE_Get = "获取成功！"
-	SUCCESS_MESSAGE_Delete = "删除成功！"
-	SUCCESS_MESSAGE_Upload = "上传成功！"
-)
 
 var (
 	api_code = library.Config.App.Api.Field.Code

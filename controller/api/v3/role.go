@@ -17,14 +17,14 @@ func RoleCreate(c *gin.Context)  {
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_BindData"), nil, err)
 		return
 	}
 
 	// Validate Form
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Validate"), nil, err)
 		return
 	}
 
@@ -32,18 +32,18 @@ func RoleCreate(c *gin.Context)  {
 	var count int64
 	database.DB.Model(&model.Role{}).Where("name = ?", j.Name).Count(&count)
 	if count > 0 {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_DuplicateRoleName, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_DuplicateRoleName"), nil, err)
 		return
 	}
 
 	var r model.Role
 	err = r.RoleCreate(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Create, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Create"), nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Create, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Create"), nil)
 	return
 }
 
@@ -53,7 +53,7 @@ func RoleGetAll(c *gin.Context)  {
 	var r model.Role
 	data, count := r.RoleGetAll(c)
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Get, gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Get"), gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
 	return
 }
 
@@ -64,14 +64,14 @@ func RoleEdit(c *gin.Context)  {
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_BindData"), nil, err)
 		return
 	}
 
 	// Validate Form
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Validate"), nil, err)
 		return
 	}
 
@@ -79,19 +79,19 @@ func RoleEdit(c *gin.Context)  {
 	var count int64
 	database.DB.Model(&model.Role{}).Where("name = ?", j.Name).Where("id != ?", j.ID).Count(&count)
 	if count > 0 {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_DuplicateRoleName, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_DuplicateRoleName"), nil, err)
 		return
 	}
 
 	var r model.Role
 	err = r.RoleEdit(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Edit, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Edit"), nil, err)
 		return
 	}
 
 	// Return Message
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Edit, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Edit"), nil)
 	return
 }
 
@@ -101,7 +101,7 @@ func RoleDelete(c *gin.Context)  {
 	var j model.ApiRoleDelete
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_BindData"), nil, err)
 		return
 	}
 
@@ -115,18 +115,18 @@ func RoleDelete(c *gin.Context)  {
 	// 查找ids中是否包含admin
 	b := model.Common_CheckIfOneIsIncludeInIds(ids)
 	if b {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_ProhibitOperationOfAdministratorUsers, nil, nil)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_ProhibitOperationOfAdministratorUsers"), nil, nil)
 		return
 	}
 
 	var r model.Role
 	err := r.RoleDelete(ids)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Delete, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Delete"), nil, err)
 		return
 	}
 
 	// Return Message
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Delete, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Delete"), nil)
 	return
 }
