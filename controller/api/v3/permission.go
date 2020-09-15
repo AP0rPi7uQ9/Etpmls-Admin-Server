@@ -15,25 +15,25 @@ func PermissionCreate(c *gin.Context)  {
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionCreate_Bind, core.ERROR_MESSAGE_PermissionCreate_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	// Validate Form
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionCreate_Validate, core.ERROR_MESSAGE_PermissionCreate_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	var p model.Permission
 	err = p.PermissionCreate(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionCreate, core.ERROR_MESSAGE_PermissionCreate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Create, nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_PermissionCreate, core.SUCCESS_MESSAGE_PermissionCreate, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Create, nil)
 	return
 }
 
@@ -43,7 +43,7 @@ func PermissionGetAll(c *gin.Context)  {
 	var p model.Permission
 	data, count := p.PermissionGetAll(c)
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_PermissionGetAll, core.SUCCESS_MESSAGE_PermissionGetAll, gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Get, gin.H{"data": data, library.Config.App.Api.Pagination.Field.Count: count})
 	return
 }
 
@@ -54,26 +54,26 @@ func PermissionEdit(c *gin.Context)  {
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionEdit_Bind, core.ERROR_MESSAGE_PermissionEdit_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	// Validate Form
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionEdit_Validate, core.ERROR_MESSAGE_PermissionEdit_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	var p model.Permission
 	err = p.PermissionEdit(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionEdit, core.ERROR_MESSAGE_PermissionEdit, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Edit, nil, err)
 		return
 	}
 
 	// Return Message
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_PermissionEdit, core.SUCCESS_MESSAGE_PermissionEdit, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Edit, nil)
 	return
 }
 
@@ -83,7 +83,7 @@ func PermissionDelete(c *gin.Context)  {
 	var j model.ApiPermissionDelete
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionDelete_Bind, core.ERROR_MESSAGE_PermissionDelete_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
@@ -95,11 +95,11 @@ func PermissionDelete(c *gin.Context)  {
 	var p model.Permission
 	err := p.PermissionDelete(ids)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_PermissionDelete, core.ERROR_MESSAGE_PermissionDelete, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Delete, nil, err)
 		return
 	}
 
 	// Return Message
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_PermissionDelete, core.SUCCESS_MESSAGE_PermissionDelete, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Delete, nil)
 	return
 }

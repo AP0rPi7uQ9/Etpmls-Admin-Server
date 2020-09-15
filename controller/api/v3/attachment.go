@@ -11,54 +11,54 @@ import (
 func AttachmentUploadImage(c *gin.Context)  {
 	file, err := c.FormFile("file")
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentUploadImage_Get_file, core.ERROR_MESSAGE_AttachmentUploadImage_Get_file, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Get, nil, err)
 		return
 	}
 
 	var a model.Attachment
 	extension, err := a.AttachmentValidateImage(file)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentUploadImage_Validate, core.ERROR_MESSAGE_AttachmentUploadImage_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	path, err := a.AttachmentUploadImage(c, file, extension)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentUploadImage, core.ERROR_MESSAGE_AttachmentUploadImage, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Upload, nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UploadImage, core.SUCCESS_MESSAGE_UploadImage, gin.H{"path": path})
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Upload, gin.H{"path": path})
 	return
 }
 
 func AttachmentDeleteImage(c *gin.Context)  {
 	var j model.ApiAttachmentDeleteImage
 	if err := c.ShouldBindJSON(&j); err != nil{
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage_Bind, core.ERROR_MESSAGE_AttachmentDeleteImage_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	// Validate Form
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage_Validate, core.ERROR_MESSAGE_AttachmentDeleteImage_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 	// Validate Path
 	var a model.Attachment
 	err = a.AttachmentValidatePath(j.Path)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage_Validate_path, core.ERROR_MESSAGE_AttachmentDeleteImage_Validate_path, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	// Delete Image
 	if err = a.AttachmentDeleteImage(j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_AttachmentDeleteImage, core.ERROR_MESSAGE_AttachmentDeleteImage, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Delete, nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_AttachmentDeleteImage, core.SUCCESS_MESSAGE_AttachmentDeleteImage, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Delete, nil)
 	return
 }

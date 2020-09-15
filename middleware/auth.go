@@ -22,7 +22,7 @@ func BasicCheck() gin.HandlerFunc {
 		// 获取token
 		token, err := core.GetToken(c)
 		if err != nil {
-			core.JsonError(c, http.StatusPaymentRequired, core.MIDDLEWARE_GET_TOKEN_ERROR, core.MIDDLEWARE_GET_TOKEN_ERROR_MESSAGE, nil, err)
+			core.JsonError(c, http.StatusPaymentRequired, core.ERROR_Code, core.ERROR_MESSAGE_GetToken, nil, err)
 			c.Abort()
 			return
 		}
@@ -31,7 +31,7 @@ func BasicCheck() gin.HandlerFunc {
 		// 获取Claims
 		_, err = library.Jwt_Token.ParseToken(token)
 		if err != nil {
-			core.JsonError(c, http.StatusPaymentRequired, core.MIDDLEWARE_PARSE_TOKEN_ERROR, core.MIDDLEWARE_PARSE_TOKEN_ERROR_MESSAGE, nil, err)
+			core.JsonError(c, http.StatusPaymentRequired, core.ERROR_Code, core.ERROR_MESSAGE_TokenVerificationFailed, nil, err)
 			c.Abort()
 			return
 		}
@@ -50,7 +50,7 @@ func RoleCheck() gin.HandlerFunc {
 		// 获取token
 		token, err := core.GetToken(c)
 		if err != nil {
-			core.JsonError(c, http.StatusPaymentRequired, core.MIDDLEWARE_GET_TOKEN_ERROR, core.MIDDLEWARE_GET_TOKEN_ERROR_MESSAGE, nil, err)
+			core.JsonError(c, http.StatusPaymentRequired, core.ERROR_Code, core.ERROR_MESSAGE_GetToken, nil, err)
 			c.Abort()
 			return
 		}
@@ -60,7 +60,7 @@ func RoleCheck() gin.HandlerFunc {
 		tmp, err := library.Jwt_Token.ParseToken(token)
 		tk, ok := tmp.(*jwt.Token)
 		if !ok || err != nil {
-			core.JsonError(c, http.StatusPaymentRequired, core.MIDDLEWARE_PARSE_TOKEN_ERROR, core.MIDDLEWARE_PARSE_TOKEN_ERROR_MESSAGE, nil, err)
+			core.JsonError(c, http.StatusPaymentRequired, core.ERROR_Code, core.ERROR_MESSAGE_TokenVerificationFailed, nil, err)
 			c.Abort()
 			return
 		}
@@ -76,7 +76,7 @@ func RoleCheck() gin.HandlerFunc {
 			}
 		}
 		// 没权限就是401
-		core.JsonError(c, http.StatusUnauthorized, core.ERROR_Permission_Check, core.ERROR_MESSAGE_Permission_Check, nil, err)
+		core.JsonError(c, http.StatusUnauthorized, core.ERROR_Code, core.ERROR_MESSAGE_PermissionDenied, nil, err)
 		c.Abort()
 		return
 	}

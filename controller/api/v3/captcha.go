@@ -15,6 +15,6 @@ func CaptchaGetPicture(c *gin.Context)  {
 
 func CaptchaGetOne(c *gin.Context)  {
 	captchaId := library.CaptchaGenerateId()
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_CaptchaGetOne, core.SUCCESS_MESSAGE_CaptchaGetOne, captchaId)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Get, captchaId)
 	return
 }

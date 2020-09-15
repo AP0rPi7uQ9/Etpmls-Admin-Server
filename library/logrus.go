@@ -41,5 +41,4 @@ func GeneralLog(content interface{})  {
 	if strings.ToUpper(os.Getenv("DEBUG")) == "TRUE" {
 		fmt.Println(content)
 	}
-
 }

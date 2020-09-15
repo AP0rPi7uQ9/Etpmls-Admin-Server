@@ -15,7 +15,7 @@ func UserRegister(c *gin.Context)  {
 	// Registration is not enabled
 	// 注册功能未开启
 	if library.Config.App.Register == false {
-		core.JsonError(c, http.StatusBadRequest, core.USER_CLOSE_REGISTER_ERROR, core.USER_CLOSE_REGISTER_ERROR_MESSAGE, nil, nil)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_RegistrationFunctionClosed, nil, nil)
 		return
 	}
 
@@ -23,14 +23,14 @@ func UserRegister(c *gin.Context)  {
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_REGISTER_BIND_ERROR, core.USER_REGISTER_BIND_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	//Validate
 	err := library.ValidateRegister(&j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_REGISTER_VALIDATE_ERROR, core.USER_REGISTER_VALIDATE_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
@@ -38,7 +38,7 @@ func UserRegister(c *gin.Context)  {
 	var count int64
 	database.DB.Model(&model.User{}).Where("username = ?", j.Username).Count(&count)
 	if count > 0 {
-		core.JsonError(c, http.StatusBadRequest, core.USER_EXISTS_ERROR, core.USER_EXISTS_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_DuplicateUserName, nil, err)
 		return
 	}
 
@@ -46,13 +46,13 @@ func UserRegister(c *gin.Context)  {
 	var u model.User
 	id, err := u.UserRegister(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_REGISTER_ERROR, core.USER_REGISTER_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Register, nil, err)
 		return
 	}
 
 	//Return Token
 	data := map[string]uint{"id": id}
-	core.JsonSuccess(c, http.StatusOK, core.USER_REGISTER_SUCCESS, core.USER_REGISTER_SUCCESS_MESSAGE, data)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Register, data)
 	return
 }
 
@@ -71,21 +71,21 @@ func UserLogin(c *gin.Context)  {
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_BIND_ERROR, core.USER_LOGIN_BIND_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	//Validate
 	err := library.ValidateZh(&j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_VALIDATE_ERROR, core.USER_LOGIN_VALIDATE_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	var u model.User
 	id, username, err := u.UserLogin(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_ERROR, core.USER_LOGIN_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Login, nil, err)
 		return
 	}
 
@@ -93,14 +93,14 @@ func UserLogin(c *gin.Context)  {
 	var us model.User
 	token, err := us.UserGetToken(id, username)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_GET_TOKEN_ERROR, core.USER_GET_TOKEN_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_GetToken, nil, err)
 		return
 	}
 
 	//Return Token
 	resData := make(map[string]string)
 	resData["token"] = token
-	core.JsonSuccess(c, http.StatusOK, core.USER_LOGIN_SUCCESS, core.USER_LOGIN_SUCCESS_MESSAGE, resData)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Login, resData)
 }
 
 // User login Without Captcha
@@ -110,21 +110,21 @@ func UserLoginWithoutCaptcha(c *gin.Context)  {
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_BIND_WITHOUT_CAPTCHA_ERROR, core.USER_LOGIN_BIND_WITHOUT_CAPTCHA_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	//Validate
 	err := library.ValidateZh(&j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_VALIDATE_WITHOUT_CAPTCHA_ERROR, core.USER_LOGIN_VALIDATE_WITHOUT_CAPTCHA_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	var u model.User
 	id, username, err := u.UserLoginWithoutCaptcha(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_LOGIN_WITHOUT_CAPTCHA_ERROR, core.USER_LOGIN_WITHOUT_CAPTCHA_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Login, nil, err)
 		return
 	}
 
@@ -132,19 +132,19 @@ func UserLoginWithoutCaptcha(c *gin.Context)  {
 	var us model.User
 	token, err := us.UserGetToken(id, username)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.USER_GET_TOKEN_WITHOUT_CAPTCHA_ERROR, core.USER_GET_TOKEN_WITHOUT_CAPTCHA_ERROR_MESSAGE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_GetToken, nil, err)
 		return
 	}
 
 	//Return Token
 	resData := make(map[string]string)
 	resData["token"] = token
-	core.JsonSuccess(c, http.StatusOK, core.USER_LOGIN_WITHOUT_CAPTCHA_SUCCESS, core.USER_LOGIN_WITHOUT_CAPTCHA_SUCCESS_MESSAGE, resData)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Login, resData)
 }
 
 // 用户登出
 func UserLogout(c *gin.Context)  {
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UserLogout, core.SUCCESS_MESSAGE_UserLogout, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Logout, nil)
 	return
 }
 
@@ -153,7 +153,7 @@ func UserLogout(c *gin.Context)  {
 func UserGetAll(c *gin.Context)  {
 	var u model.User
 	data := u.UserGetAll(c)
-	core.JsonSuccess(c, http.StatusOK, core.USER_GET_ALL_SUCCESS, core.USER_GET_ALL_SUCCESS_MESSAGE, data)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Get, data)
 	return
 }
 
@@ -163,11 +163,11 @@ func UserGetCurrent(c *gin.Context)  {
 	var us model.User
 	u, err := us.UserGetCurrent(c)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserGetCurrent_GET_USER_FAILED, core.ERROR_MESSAGE_UserGetCurrent_GET_USER_FAILED, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Get, nil, err)
 		return
 	}
 
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UserGetCurrent, core.SUCCESS_MESSAGE_UserGetCurrent, u)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Get, u)
 	return
 }
 
@@ -178,25 +178,25 @@ func UserCreate(c *gin.Context)  {
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserCreate_Bind, core.ERROR_MESSAGE_UserCreate_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	// Validate Json
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserCreate_VALIDATE, core.ERROR_MESSAGE_UserCreate_VALIDATE, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
 	// Validate Username unique
 	var count int64
 	if err := database.DB.Model(&model.User{}).Where("username = ?", j.Username).Count(&count).Error; err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserCreate_Count, core.ERROR_MESSAGE_UserCreate_Count, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Get, nil, err)
 		return
 	}
 	if count > 0 {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserCreate_Duplicate_user, core.ERROR_MESSAGE_UserCreate_Duplicate_user, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_DuplicateUserName, nil, err)
 		return
 	}
 
@@ -204,12 +204,12 @@ func UserCreate(c *gin.Context)  {
 	var u model.User
 	err = u.UserCreate(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserCreate, core.ERROR_MESSAGE_UserCreate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Create, nil, err)
 		return
 	}
 
 	//Return Token
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UserCreate, core.SUCCESS_MESSAGE_UserCreate, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Create, nil)
 	return
 }
 
@@ -220,14 +220,14 @@ func UserEdit(c *gin.Context)  {
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit_Bind, core.ERROR_MESSAGE_UserEdit_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	// Validate Json
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit_Validate, core.ERROR_MESSAGE_UserEdit_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
@@ -235,19 +235,19 @@ func UserEdit(c *gin.Context)  {
 	var count int64
 	database.DB.Model(&model.User{}).Where("username = ?", j.Username).Where("id != ?", j.ID).Count(&count)
 	if (count > 0) {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit_Duplicate_user, core.ERROR_MESSAGE_UserEdit_Duplicate_user, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_DuplicateUserName, nil, err)
 		return
 	}
 
 	var u model.User
 	err = u.UserEdit(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserEdit, core.ERROR_MESSAGE_UserEdit, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Edit, nil, err)
 		return
 	}
 
 	//Return Token
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UserEdit, core.SUCCESS_MESSAGE_UserEdit, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Edit, nil)
 	return
 }
 
@@ -257,7 +257,7 @@ func UserDelete(c *gin.Context)  {
 	var j model.ApiUserDelete
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserDelete_Bind, core.ERROR_MESSAGE_UserDelete_Bind, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
@@ -270,19 +270,19 @@ func UserDelete(c *gin.Context)  {
 	// 查找ids中是否包含admin
 	b := model.Common_CheckIfOneIsIncludeInIds(ids)
 	if b {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserDelete_Remove_admin, core.ERROR_MESSAGE_UserDelete_Remove_admin, nil, nil)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_PermissionDenied, nil, nil)
 		return
 	}
 
 	var u model.User
 	err := u.UserDelete(ids)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserDelete, core.ERROR_MESSAGE_UserDelete, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Delete, nil, err)
 		return
 	}
 
 	// Return Message
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_UserDelete, core.SUCCESS_MESSAGE_UserDelete, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Delete, nil)
 	return
 }
 
@@ -293,14 +293,14 @@ func UserUpdateInformation(c *gin.Context)  {
 
 	// Bind data
 	if err := c.ShouldBindJSON(&j); err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Bind, core.ERROR_MESSAGE_Bind_data, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_BindData, nil, err)
 		return
 	}
 
 	// Validate Json
 	err := library.ValidateZh(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Validate, core.ERROR_MESSAGE_Validate, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Validate, nil, err)
 		return
 	}
 
@@ -308,7 +308,7 @@ func UserUpdateInformation(c *gin.Context)  {
 	var us model.User
 	j.ID, err = us.User_GetUserIdByRequest(c)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation_Get_current_user_id, core.ERROR_MESSAGE_Get_current_user_information, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Get, nil, err)
 		return
 	}
 
@@ -321,11 +321,11 @@ func UserUpdateInformation(c *gin.Context)  {
 	var u model.User
 	err = u.UserUpdateInformation(j)
 	if err != nil {
-		core.JsonError(c, http.StatusBadRequest, core.ERROR_UserUpdateInformation, core.ERROR_MESSAGE_Internal, nil, err)
+		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.ERROR_MESSAGE_Edit, nil, err)
 		return
 	}
 
 	//Return Token
-	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Internal, core.SUCCESS_MESSAGE_Internal, nil)
+	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.SUCCESS_MESSAGE_Edit, nil)
 	return
 }
