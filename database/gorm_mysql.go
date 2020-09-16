@@ -17,7 +17,7 @@ const (
 )
 
 func init() {
-	dsn := library.Config.Database.User + ":" + library.Config.Database.Password + "@tcp(" + library.Config.Database.Host + ":" + library.Config.Database.Port + ")/" + library.Config.Database.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := library.Config.Database.User + ":" + library.Config.Database.Password + "@tcp(" + library.Config.Database.Host + ":" + library.Config.Database.Port + ")/" + library.Config.Database.Name + "?charset=utf8mb4&parseTime=True&loc=" +  + library.Config.App.TimeZone
 
 	//Connect Database
 	var err error
@@ -30,7 +30,7 @@ func init() {
 		core.LogPanic.AutoOutputDebug("连接数据库失败！", err)
 	}
 
-	err = DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(migrateList...)
+	err = DB.AutoMigrate(migrateList...)
 	if err != nil {
 		core.LogInfo.AutoOutputDebug("创建数据库失败！", err)
 	}

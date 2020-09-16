@@ -19,6 +19,7 @@ type configuration struct {
 		Cache bool
 		TokenExpirationTime time.Duration	`yaml:"token-expiration-time"`
 		UseHttpCode bool	`yaml:"use-http-code"`
+		TimeZone string		`yaml:"time-zone"`
 	}
 	Log struct {
 		Level string

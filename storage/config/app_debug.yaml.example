@@ -20,6 +20,9 @@ app:
   # [Required] Whether to use the http status code as the code field in the api (true/false), the default is false
   # [必填] 是否使用http状态码作为api中的code字段(true/false)，默认为false
   use-http-code: false
+  # [Required] The time zone the application belongs to, the default is Asia/Shanghai
+  # [必填] 应用所属时区，默认为Asia/Shanghai
+  time-zone: Asia/Shanghai
 log:
   # [Required] The lowest level of logging (panic/fatal/error/warning/info/debug/trace), the default is info
   # [必填] 记录日志的最低等级(panic/fatal/error/warning/info/debug/trace)，默认为info
