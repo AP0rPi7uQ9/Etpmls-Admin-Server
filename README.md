@@ -36,7 +36,7 @@ DEBUG="FALSE"
 INIT_DATABASE="FALSE"
 ```
 
-**DEBUG: **
+**DEBUG:**
 
 Whether to enable debugging mode. (TRUE/FALSE),
 If you fill in TRUE, the **app.yaml** in the configuration file is read by default,
