@@ -128,9 +128,10 @@ name: []
 
 
 
-## Run 运行
+## Run
 
 PostgreSQL
+
 ```shell script
 go run -tags=postgresql main.go
 ```
@@ -140,7 +141,9 @@ MySQL/MariaDB
 go run -tags=mysql main.go
 ```
 
-
+This project uses GORM, which theoretically supports databases consistent with GORM, but due to practicality, I only wrote support for postgresql and mysql/mariadb.
+If you need to support other databases, you only need to modify the *database/gorm_postgresql.go* (connection database file) and *database/field_postgresql.go* (database structure file) to write your own database.
+If you have plenty of time, you can also share your source code with EA.
 
 ## Developer Manual
 
@@ -284,3 +287,23 @@ name: []
 
 3. 在/module下创建你自己的模块文件夹，并且gitignore屏蔽除了你开发模块之外的所有文件。
 
+
+
+## 运行
+
+PostgreSQL
+
+```shell script
+go run -tags=postgresql main.go
+```
+
+MySQL/MariaDB
+
+```shell script
+go run -tags=mysql main.go
+```
+
+本项目使用的是GORM，理论上支持与GORM一致的数据库，但是由于实用性，我只写了postgresql和mysql/mariadb的支持。
+如果你需要支持其他数据库，你只需要更改仿照*database/gorm_postgresql.go*（连接数据库文件）和*database/field_postgresql.go*（数据库结构文件）来写属于你自己的数据库即可。
+
+如果你的时间充裕，也可以向EA分享你的源码。
