@@ -181,7 +181,7 @@ DEBUG="FALSE"
 INIT_DATABASE="FALSE"
 ```
 
-**DEBUG: **
+**DEBUG:**
 
 是否开启调试模式。(TRUE/FALSE)，
 
