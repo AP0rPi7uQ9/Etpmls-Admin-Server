@@ -17,7 +17,7 @@ const (
 )
 
 func init() {
-	dsn := library.Config.Database.User + ":" + library.Config.Database.Password + "@tcp(" + library.Config.Database.Host + ":" + library.Config.Database.Port + ")/" + library.Config.Database.Name + "?charset=utf8mb4&parseTime=True&loc=" +  + library.Config.App.TimeZone
+	dsn := library.Config.Database.User + ":" + library.Config.Database.Password + "@tcp(" + library.Config.Database.Host + ":" + library.Config.Database.Port + ")/" + library.Config.Database.Name + "?charset=utf8mb4&parseTime=True&loc=" + library.Config.App.TimeZone
 
 	//Connect Database
 	var err error
