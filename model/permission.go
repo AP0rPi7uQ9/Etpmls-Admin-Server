@@ -56,7 +56,10 @@ func (this *Permission)PermissionCreate(c *gin.Context, j ApiPermissionCreate) (
 			return err
 		}
 		select {
-		case core.Event.Event_PermissionCreate <- p:
+		case core.Event.Event_PermissionCreate <- core.EventObject{
+			Context: c,
+			Content: p,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 
@@ -130,7 +133,10 @@ func (this *Permission) PermissionEdit(c *gin.Context, j ApiPermissionEdit) (err
 			return err
 		}
 		select {
-		case core.Event.Event_PermissionEdit <- p:
+		case core.Event.Event_PermissionEdit <- core.EventObject{
+			Context: c,
+			Content: p,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 
@@ -170,7 +176,10 @@ func (this *Permission) PermissionDelete(c *gin.Context, ids []uint) (err error)
 
 		// Delete Event for module
 		select {
-		case core.Event.Event_PermissionDelete <- p:
+		case core.Event.Event_PermissionDelete <- core.EventObject{
+			Context: c,
+			Content: p,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 

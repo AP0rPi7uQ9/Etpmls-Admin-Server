@@ -166,7 +166,10 @@ func (this *User) UserCreate(c *gin.Context, j ApiUserCreate) (err error) {
 			return err
 		}
 		select {
-		case core.Event.Event_UserCreate <- u:
+		case core.Event.Event_UserCreate <- core.EventObject{
+			Context: c,
+			Content: u,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 
@@ -222,7 +225,10 @@ func (this *User) UserEdit(c *gin.Context, j ApiUserEdit) (err error) {
 			return err
 		}
 		select {
-		case core.Event.Event_UserEdit <- u:
+		case core.Event.Event_UserEdit <- core.EventObject{
+			Context: c,
+			Content: u,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 
@@ -266,7 +272,10 @@ func (this *User) UserDelete(c *gin.Context, ids []uint) (err error) {
 
 		// User Delete Event for module
 		select {
-		case core.Event.Event_UserDelete <- u:
+		case core.Event.Event_UserDelete <- core.EventObject{
+			Context: c,
+			Content: u,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 

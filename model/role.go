@@ -49,7 +49,10 @@ func (this *Role) RoleCreate(c *gin.Context, j ApiRoleCreate) (error) {
 			return err
 		}
 		select {
-		case core.Event.Event_RoleCreate <- r:
+		case core.Event.Event_RoleCreate <- core.EventObject{
+			Context: c,
+			Content: r,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 
@@ -86,7 +89,10 @@ func (this *Role) RoleEdit(c *gin.Context, j ApiRoleEdit) (error) {
 			return err
 		}
 		select {
-		case core.Event.Event_RoleEdit <- r:
+		case core.Event.Event_RoleEdit <- core.EventObject{
+			Context: c,
+			Content: r,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 
@@ -158,7 +164,10 @@ func (this *Role) RoleDelete(c *gin.Context, ids []uint) (err error) {
 
 		// Role Delete Event for module
 		select {
-		case core.Event.Event_RoleDelete <- r:
+		case core.Event.Event_RoleDelete <- core.EventObject{
+			Context: c,
+			Content: r,
+		}:
 		case <- time.After(time.Second * 3):
 		}
 

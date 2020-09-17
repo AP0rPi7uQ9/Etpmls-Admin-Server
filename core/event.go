@@ -1,18 +1,25 @@
 package core
 
+import "github.com/gin-gonic/gin"
+
 var Event *EventManager
+
+type EventObject struct {
+	Context *gin.Context
+	Content interface{}
+}
 
 
 type EventManager struct {
-	Event_UserCreate chan interface{}
-	Event_UserEdit chan interface{}
-	Event_UserDelete chan interface{}
-	Event_RoleCreate chan interface{}
-	Event_RoleEdit chan interface{}
-	Event_RoleDelete chan interface{}
-	Event_PermissionCreate chan interface{}
-	Event_PermissionEdit chan interface{}
-	Event_PermissionDelete chan interface{}
+	Event_UserCreate chan EventObject
+	Event_UserEdit chan EventObject
+	Event_UserDelete chan EventObject
+	Event_RoleCreate chan EventObject
+	Event_RoleEdit chan EventObject
+	Event_RoleDelete chan EventObject
+	Event_PermissionCreate chan EventObject
+	Event_PermissionEdit chan EventObject
+	Event_PermissionDelete chan EventObject
 }
 
 
@@ -20,20 +27,20 @@ func init() {
 	// Initialization Event
 	// 初始化Event
 	Event = &EventManager{
-		Event_UserCreate:       make(chan interface{}, 10),
-		Event_UserEdit:         make(chan interface{}, 10),
-		Event_UserDelete:       make(chan interface{}, 10),
-		Event_RoleCreate:       make(chan interface{}, 10),
-		Event_RoleEdit:         make(chan interface{}, 10),
-		Event_RoleDelete:       make(chan interface{}, 10),
-		Event_PermissionCreate: make(chan interface{}, 10),
-		Event_PermissionEdit:   make(chan interface{}, 10),
-		Event_PermissionDelete: make(chan interface{}, 10),
+		Event_UserCreate:       make(chan EventObject, 10),
+		Event_UserEdit:         make(chan EventObject, 10),
+		Event_UserDelete:       make(chan EventObject, 10),
+		Event_RoleCreate:       make(chan EventObject, 10),
+		Event_RoleEdit:         make(chan EventObject, 10),
+		Event_RoleDelete:       make(chan EventObject, 10),
+		Event_PermissionCreate: make(chan EventObject, 10),
+		Event_PermissionEdit:   make(chan EventObject, 10),
+		Event_PermissionDelete: make(chan EventObject, 10),
 	}
 }
 
 
-type Event_CallbackFunc func(interface{})
+type Event_CallbackFunc func(EventObject)
 
 func (this *EventManager) UserCreate (callback Event_CallbackFunc)  {
 	for {

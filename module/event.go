@@ -1,8 +1,10 @@
 package module
 
+import "Etpmls-Admin-Server/core"
+
 // User Create Event
 // 用户创建事件
-func UserCreate(i interface{}) {
+func UserCreate(o core.EventObject) {
 	// What you need to do when a user is created...
 	// 用户创建时你需要做的事情
 	// ...
@@ -12,7 +14,7 @@ func UserCreate(i interface{}) {
 
 // User Edit Event
 // 用户修改事件
-func UserEdit(i interface{}) {
+func UserEdit(o core.EventObject) {
 	// What you need to do when a user is created...
 	// 用户创建时你需要做的事情
 	// ...
@@ -22,7 +24,7 @@ func UserEdit(i interface{}) {
 
 // User Delete Event
 // 用户删除事件
-func UserDelete(i interface{}) {
+func UserDelete(o core.EventObject) {
 	// ...
 	return
 }
@@ -30,7 +32,7 @@ func UserDelete(i interface{}) {
 
 // Role Create Event
 // 角色创建事件
-func RoleCreate(i interface{}) {
+func RoleCreate(o core.EventObject) {
 	// ...
 	return
 }
@@ -38,7 +40,7 @@ func RoleCreate(i interface{}) {
 
 // User Edit Event
 // 角色修改事件
-func RoleEdit(i interface{}) {
+func RoleEdit(o core.EventObject) {
 	// ...
 	return
 }
@@ -46,7 +48,7 @@ func RoleEdit(i interface{}) {
 
 // User Delete Event
 // 角色删除事件
-func RoleDelete(i interface{}) {
+func RoleDelete(o core.EventObject) {
 	// ...
 	return
 }
@@ -54,7 +56,7 @@ func RoleDelete(i interface{}) {
 
 // Permission Create Event
 // 权限创建事件
-func PermissionCreate(i interface{}) {
+func PermissionCreate(o core.EventObject) {
 	// ...
 	return
 }
@@ -62,7 +64,7 @@ func PermissionCreate(i interface{}) {
 
 // Permission Edit Event
 // 权限修改事件
-func PermissionEdit(i interface{}) {
+func PermissionEdit(o core.EventObject) {
 	// ...
 	return
 }
@@ -70,7 +72,7 @@ func PermissionEdit(i interface{}) {
 
 // Permission Delete Event
 // 权限删除事件
-func PermissionDelete(i interface{}) {
+func PermissionDelete(o core.EventObject) {
 	// ...
 	return
 }
