@@ -95,7 +95,9 @@ func (this *Menu) menu_GetAll_NoCache() (interface{}, error) {
 	}
 	// Save menu
 	// 储存菜单
-	library.Cache.SetString(core.Cache_MenuGetAll, string(ctx), 0)
+	if library.Config.App.Cache {
+		library.Cache.SetString(core.Cache_MenuGetAll, string(ctx), 0)
+	}
 
 	var j interface{}
 	err = json.Unmarshal(ctx, &j)
