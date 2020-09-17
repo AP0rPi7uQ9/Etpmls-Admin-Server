@@ -1,7 +1,10 @@
 package model
 
 import (
+	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
+	"Etpmls-Admin-Server/module"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"strings"
@@ -34,20 +37,37 @@ type ApiPermissionCreate struct {
 	Remark string `json:"remark"`
 	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
-func (this *Permission)PermissionCreate(j ApiPermissionCreate) (error) {
-	type Permission ApiPermissionCreate
-	form := Permission(j)
+func (this *Permission)PermissionCreate(c *gin.Context, j ApiPermissionCreate) (error) {
+	err := database.DB.Transaction(func(tx *gorm.DB) error {
+		type Permission ApiPermissionCreate
+		form := Permission(j)
 
-	// []string -> string
-	form.Method = strings.Join(form.TmpMethod, ",")
+		// []string -> string
+		form.Method = strings.Join(form.TmpMethod, ",")
 
-	// Insert Data
-	result := database.DB.Create(&form)
-	if result.Error != nil {
-		return result.Error
-	}
+		// Insert Data
+		result := tx.Create(&form)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	return nil
+		// Create Hook for module
+		p, err := this.Permission_InterfaceToPermission(form)
+		if err != nil {
+			return err
+		}
+		var hook module.Hook
+		err = hook.PermissionCreate(c, p)
+		if err != nil {
+			return err
+		}
+
+
+		return nil
+	})
+
+
+	return err
 }
 
 
@@ -93,19 +113,35 @@ type ApiPermissionEdit struct {
 	Remark string `json:"remark"`
 	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
-func (this *Permission) PermissionEdit(j ApiPermissionEdit) (error) {
-	type Permission ApiPermissionEdit
-	form := Permission(j)
+func (this *Permission) PermissionEdit(c *gin.Context, j ApiPermissionEdit) (error) {
+	err := database.DB.Transaction(func(tx *gorm.DB) error {
+		type Permission ApiPermissionEdit
+		form := Permission(j)
 
-	// []string -> string
-	form.Method = strings.Join(form.TmpMethod, ",")
+		// []string -> string
+		form.Method = strings.Join(form.TmpMethod, ",")
 
-	result := database.DB.Save(&form)
-	if result.Error != nil {
-		return result.Error
-	}
+		result := tx.Save(&form)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	return nil
+		// Edit Hook for module
+		p, err := this.Permission_InterfaceToPermission(form)
+		if err != nil {
+			return err
+		}
+		var hook module.Hook
+		err = hook.PermissionEdit(c, p)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+
+	return err
 }
 
 
@@ -118,19 +154,26 @@ type ApiPermissionDelete struct {
 	DeletedAt *time.Time `json:"-"`
 	Permissions []Permission `json:"permissions" binding:"required" validate:"min=1"`
 }
-func (this *Permission) PermissionDelete(ids []uint) (err error) {
+func (this *Permission) PermissionDelete(c *gin.Context, ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var p []Permission
-		database.DB.Where("id IN ?", ids).Find(&p)
+		tx.Where("id IN ?", ids).Find(&p)
 
 		// 删除权限
-		result := database.DB.Delete(&p)
+		result := tx.Delete(&p)
 		if result.Error != nil {
 			return result.Error
 		}
 
 		// 删除关联
-		err = database.DB.Model(&p).Association("Roles").Clear()
+		err = tx.Model(&p).Association("Roles").Clear()
+		if err != nil {
+			return err
+		}
+
+		// Delete Hook for module
+		var hook module.Hook
+		err = hook.PermissionDelete(c, p)
 		if err != nil {
 			return err
 		}
@@ -139,4 +182,22 @@ func (this *Permission) PermissionDelete(ids []uint) (err error) {
 	})
 
 	return err
+}
+
+
+// interface conversion Permission
+// interface转换Permission
+func (this *Permission) Permission_InterfaceToPermission(i interface{}) (Permission, error) {
+	var p Permission
+	us, err := json.Marshal(i)
+	if err != nil {
+		core.LogError.Output("User_InterfaceToUser:对象转JSON失败! err:" + err.Error())
+		return Permission{}, err
+	}
+	err = json.Unmarshal(us, &p)
+	if err != nil {
+		core.LogError.Output("User_InterfaceToUser:JSON转换对象失败! err:" + err.Error())
+		return Permission{}, err
+	}
+	return p, nil
 }

@@ -202,7 +202,7 @@ func UserCreate(c *gin.Context)  {
 
 	//Create User
 	var u model.User
-	err = u.UserCreate(j)
+	err = u.UserCreate(c, j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Create"), nil, err)
 		return
@@ -240,7 +240,7 @@ func UserEdit(c *gin.Context)  {
 	}
 
 	var u model.User
-	err = u.UserEdit(j)
+	err = u.UserEdit(c, j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Edit"), nil, err)
 		return
@@ -275,7 +275,7 @@ func UserDelete(c *gin.Context)  {
 	}
 
 	var u model.User
-	err := u.UserDelete(ids)
+	err := u.UserDelete(c, ids)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Delete"), nil, err)
 		return

@@ -27,7 +27,7 @@ func PermissionCreate(c *gin.Context)  {
 	}
 
 	var p model.Permission
-	err = p.PermissionCreate(j)
+	err = p.PermissionCreate(c, j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Create"), nil, err)
 		return
@@ -66,7 +66,7 @@ func PermissionEdit(c *gin.Context)  {
 	}
 
 	var p model.Permission
-	err = p.PermissionEdit(j)
+	err = p.PermissionEdit(c, j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Edit"), nil, err)
 		return
@@ -93,7 +93,7 @@ func PermissionDelete(c *gin.Context)  {
 	}
 
 	var p model.Permission
-	err := p.PermissionDelete(ids)
+	err := p.PermissionDelete(c, ids)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Delete"), nil, err)
 		return

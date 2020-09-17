@@ -37,7 +37,7 @@ func RoleCreate(c *gin.Context)  {
 	}
 
 	var r model.Role
-	err = r.RoleCreate(j)
+	err = r.RoleCreate(c, j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Create"), nil, err)
 		return
@@ -84,7 +84,7 @@ func RoleEdit(c *gin.Context)  {
 	}
 
 	var r model.Role
-	err = r.RoleEdit(j)
+	err = r.RoleEdit(c, j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Edit"), nil, err)
 		return
@@ -120,7 +120,7 @@ func RoleDelete(c *gin.Context)  {
 	}
 
 	var r model.Role
-	err := r.RoleDelete(ids)
+	err := r.RoleDelete(c, ids)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Delete"), nil, err)
 		return

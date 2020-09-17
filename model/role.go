@@ -1,7 +1,10 @@
 package model
 
 import (
+	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
+	"Etpmls-Admin-Server/module"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"time"
@@ -30,17 +33,32 @@ type ApiRoleCreate struct {
 	Remark string `json:"remark"`
 	Permissions []Permission `gorm:"many2many:role_permissions;" json:"permissions"`
 }
-func (this *Role) RoleCreate(j ApiRoleCreate) (error) {
-	type Role ApiRoleCreate
-	form := Role(j)
+func (this *Role) RoleCreate(c *gin.Context, j ApiRoleCreate) (error) {
+	err := database.DB.Transaction(func(tx *gorm.DB) error {
+		type Role ApiRoleCreate
+		form := Role(j)
 
-	// Insert Data
-	result := database.DB.Create(&form)
-	if result.Error != nil {
-		return result.Error
-	}
+		// Insert Data
+		result := tx.Create(&form)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	return nil
+		// Role Create Hook for module
+		r, err := this.Role_InterfaceToRole(form)
+		if err != nil {
+			return err
+		}
+		var hook module.Hook
+		err = hook.RoleCreate(c, r)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 
@@ -55,15 +73,30 @@ type ApiRoleEdit struct {
 	Remark string `json:"remark"`
 	Permissions []Permission `gorm:"many2many:role_permissions;" json:"permissions"`
 }
-func (this *Role) RoleEdit(j ApiRoleEdit) (error) {
-	type Role ApiRoleEdit
-	form := Role(j)
-	result := database.DB.Save(&form)
-	if result.Error != nil {
-		return result.Error
-	}
+func (this *Role) RoleEdit(c *gin.Context, j ApiRoleEdit) (error) {
+	err := database.DB.Transaction(func(tx *gorm.DB) error {
+		type Role ApiRoleEdit
+		form := Role(j)
+		result := tx.Save(&form)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	return nil
+		// Role Edit Hook for module
+		r, err := this.Role_InterfaceToRole(form)
+		if err != nil {
+			return err
+		}
+		var hook module.Hook
+		err = hook.RoleEdit(c, r)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 
@@ -103,25 +136,32 @@ type ApiRoleDelete struct {
 	DeletedAt *time.Time `json:"-"`
 	Roles []Role `json:"roles" binding:"required" validate:"min=1"`
 }
-func (this *Role) RoleDelete(ids []uint) (err error) {
+func (this *Role) RoleDelete(c *gin.Context, ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var r []Role
-		database.DB.Where("id IN ?", ids).Find(&r)
+		tx.Where("id IN ?", ids).Find(&r)
 
 		// 删除角色
-		result := database.DB.Debug().Where("id IN ?", ids).Delete(&Role{})
+		result := tx.Where("id IN ?", ids).Delete(&Role{})
 		if result.Error != nil {
 			return result.Error
 		}
 
 		// 删除关联
-		err = database.DB.Model(&r).Association("Users").Clear()
+		err = tx.Model(&r).Association("Users").Clear()
 		if err != nil {
 			return err
 		}
 
 		// 删除关联
-		err = database.DB.Model(&r).Association("Permissions").Clear()
+		err = tx.Model(&r).Association("Permissions").Clear()
+		if err != nil {
+			return err
+		}
+
+		// Role Delete Hook for module
+		var hook module.Hook
+		err = hook.RoleDelete(c, r)
 		if err != nil {
 			return err
 		}
@@ -130,4 +170,22 @@ func (this *Role) RoleDelete(ids []uint) (err error) {
 	})
 
 	return err
+}
+
+
+// interface conversion Role
+// interface转换Role
+func (this *Role) Role_InterfaceToRole(i interface{}) (Role, error) {
+	var r Role
+	us, err := json.Marshal(i)
+	if err != nil {
+		core.LogError.Output("User_InterfaceToUser:对象转JSON失败! err:" + err.Error())
+		return Role{}, err
+	}
+	err = json.Unmarshal(us, &r)
+	if err != nil {
+		core.LogError.Output("User_InterfaceToUser:JSON转换对象失败! err:" + err.Error())
+		return Role{}, err
+	}
+	return r, nil
 }

@@ -4,6 +4,7 @@ import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
 	"Etpmls-Admin-Server/library"
+	"Etpmls-Admin-Server/module"
 	"encoding/json"
 	"errors"
 	"github.com/dchest/captcha"
@@ -144,22 +145,38 @@ type ApiUserCreate struct {
 	Password string `binding:"required" json:"password" validate:"required,max=50"`
 	Roles []Role `gorm:"many2many:role_users" binding:"required" json:"roles"`
 }
-func (this *User) UserCreate(j ApiUserCreate) (err error) {
-	type User ApiUserCreate
-	form := User(j)
+func (this *User) UserCreate(c *gin.Context, j ApiUserCreate) (err error) {
+	err = database.DB.Transaction(func(tx *gorm.DB) error {
+		type User ApiUserCreate
+		form := User(j)
 
-	// Bcrypt Password
-	form.Password, err = this.User_BcryptPasswordV2(j.Password)
-	if err != nil {
-		return errors.New("密码加密失败！")
-	}
+		// Bcrypt Password
+		form.Password, err = this.User_BcryptPasswordV2(j.Password)
+		if err != nil {
+			return errors.New("密码加密失败！")
+		}
 
-	result := database.DB.Create(&form)
-	if result.Error != nil {
-		return result.Error
-	}
+		result := tx.Create(&form)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	return nil
+		// User Create Hook for module
+		u, err := this.User_InterfaceToUser(form)
+		if err != nil {
+			return err
+		}
+		var hook module.Hook
+		err = hook.UserCreate(c, u)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+
+	return err
 }
 
 
@@ -174,7 +191,7 @@ type ApiUserEdit struct{
 	Password string `json:"password" validate:"max=50"`
 	Roles []Role `gorm:"many2many:role_users" binding:"required" json:"roles"`
 }
-func (this *User) UserEdit(j ApiUserEdit) (err error) {
+func (this *User) UserEdit(c *gin.Context, j ApiUserEdit) (err error) {
 	// Find User
 	var form User
 	database.DB.First(&form, j.ID)
@@ -200,6 +217,19 @@ func (this *User) UserEdit(j ApiUserEdit) (err error) {
 		if result.Error != nil {
 			return result.Error
 		}
+
+		// User Edit Hook for module
+		u, err := this.User_InterfaceToUser(form)
+		if err != nil {
+			return err
+		}
+		var hook module.Hook
+		err = hook.UserEdit(c, u)
+		if err != nil {
+			return err
+		}
+
+
 		return nil
 	})
 
@@ -220,19 +250,26 @@ type ApiUserDelete struct {
 	DeletedAt *time.Time `json:"-"`
 	Users []User `json:"users" binding:"required" validate:"min=1"`
 }
-func (this *User) UserDelete(ids []uint) (err error) {
+func (this *User) UserDelete(c *gin.Context, ids []uint) (err error) {
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var u []User
-		database.DB.Where("id IN ?", ids).Find(&u)
+		tx.Where("id IN ?", ids).Find(&u)
 
 		// 删除用户
-		result := database.DB.Delete(&u)
+		result := tx.Delete(&u)
 		if result.Error != nil {
 			return result.Error
 		}
 
 		// 删除关联
-		err = database.DB.Model(&u).Association("Roles").Clear()
+		err = tx.Model(&u).Association("Roles").Clear()
+		if err != nil {
+			return err
+		}
+
+		// User Delete Hook for module
+		var hook module.Hook
+		err = hook.UserDelete(c, u)
 		if err != nil {
 			return err
 		}
@@ -269,7 +306,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 		// 如果表单包含缩略图，
 		if len(j.Avatar.Path) > 0 {
 			// 1.删除同名缓存
-			result := tx.Debug().Unscoped().Where("path = ?", j.Avatar.Path).Delete(Attachment{})
+			result := tx.Unscoped().Where("path = ?", j.Avatar.Path).Delete(Attachment{})
 			if result.Error != nil {
 				return result.Error
 			}
@@ -277,7 +314,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 
 		// 2.删除历史avatar
 		var old Attachment
-		result2 := tx.Debug().Where("owner_id = ?", j.ID).Where("owner_type = ?", "user-avatar").First(&old)
+		result2 := tx.Where("owner_id = ?", j.ID).Where("owner_type = ?", "user-avatar").First(&old)
 		// 如果找到记录则删除
 		if result2.RowsAffected > 0 {
 			// 根据Path删除附件
@@ -288,7 +325,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 		}
 
 		// 3.新增avatar
-		err := tx.Debug().Model(&User{ID: j.ID}).Association("Avatar").Replace(&Attachment{Path:j.Avatar.Path})
+		err := tx.Model(&User{ID: j.ID}).Association("Avatar").Replace(&Attachment{Path:j.Avatar.Path})
 		if err != nil {
 			return err
 		}
@@ -300,7 +337,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 			j.Password, err = this.User_BcryptPasswordV2(j.Password)
 		}
 
-		result := tx.Debug().Model(&User{ID: j.ID}).Updates(&j)
+		result := tx.Model(&User{ID: j.ID}).Updates(&j)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -529,4 +566,22 @@ func (this *User) User_GetUserIdByToken(token string) (id uint, err error) {
 	}
 
 	return id, nil
+}
+
+
+// interface conversion User
+// interface转换User
+func (this *User) User_InterfaceToUser(i interface{}) (User, error) {
+	var u User
+	us, err := json.Marshal(i)
+	if err != nil {
+		core.LogError.Output("User_InterfaceToUser:对象转JSON失败! err:" + err.Error())
+		return User{}, err
+	}
+	err = json.Unmarshal(us, &u)
+	if err != nil {
+		core.LogError.Output("User_InterfaceToUser:JSON转换对象失败! err:" + err.Error())
+		return User{}, err
+	}
+	return u, nil
 }
