@@ -1,17 +1,23 @@
 package module
 
 import (
+	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/library"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 )
 
+
 func InitModule()  {
 	initYaml()
 	initDatabase()
+	initHook()
 }
 
+
+// Initialization Yaml
+// 初始化Yaml
 func initYaml()  {
 	var yamlPath string
 
@@ -38,4 +44,21 @@ func initYaml()  {
 
 	return
 
+}
+
+
+// Initialization Event
+// 初始化事件
+func initHook()  {
+	// Register Event
+	// 注册事件
+	go core.Event.UserCreate(UserCreate)
+	go core.Event.UserEdit(UserEdit)
+	go core.Event.UserDelete(UserDelete)
+	go core.Event.RoleCreate(RoleCreate)
+	go core.Event.RoleEdit(RoleEdit)
+	go core.Event.RoleDelete(RoleDelete)
+	go core.Event.PermissionCreate(PermissionCreate)
+	go core.Event.PermissionEdit(PermissionEdit)
+	go core.Event.PermissionDelete(PermissionDelete)
 }

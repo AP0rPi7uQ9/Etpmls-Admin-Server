@@ -3,7 +3,6 @@ package model
 import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
-	"Etpmls-Admin-Server/module"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -51,15 +50,14 @@ func (this *Permission)PermissionCreate(c *gin.Context, j ApiPermissionCreate) (
 			return result.Error
 		}
 
-		// Create Hook for module
+		// Create Event for module
 		p, err := this.Permission_InterfaceToPermission(form)
 		if err != nil {
 			return err
 		}
-		var hook module.Hook
-		err = hook.PermissionCreate(c, p)
-		if err != nil {
-			return err
+		select {
+		case core.Event.Event_PermissionCreate <- p:
+		case <- time.After(time.Second * 3):
 		}
 
 
@@ -126,15 +124,14 @@ func (this *Permission) PermissionEdit(c *gin.Context, j ApiPermissionEdit) (err
 			return result.Error
 		}
 
-		// Edit Hook for module
+		// Edit Event for module
 		p, err := this.Permission_InterfaceToPermission(form)
 		if err != nil {
 			return err
 		}
-		var hook module.Hook
-		err = hook.PermissionEdit(c, p)
-		if err != nil {
-			return err
+		select {
+		case core.Event.Event_PermissionEdit <- p:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil
@@ -171,11 +168,10 @@ func (this *Permission) PermissionDelete(c *gin.Context, ids []uint) (err error)
 			return err
 		}
 
-		// Delete Hook for module
-		var hook module.Hook
-		err = hook.PermissionDelete(c, p)
-		if err != nil {
-			return err
+		// Delete Event for module
+		select {
+		case core.Event.Event_PermissionDelete <- p:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil

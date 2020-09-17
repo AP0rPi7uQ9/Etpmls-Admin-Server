@@ -3,7 +3,6 @@ package model
 import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
-	"Etpmls-Admin-Server/module"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -44,15 +43,14 @@ func (this *Role) RoleCreate(c *gin.Context, j ApiRoleCreate) (error) {
 			return result.Error
 		}
 
-		// Role Create Hook for module
+		// Role Create Event for module
 		r, err := this.Role_InterfaceToRole(form)
 		if err != nil {
 			return err
 		}
-		var hook module.Hook
-		err = hook.RoleCreate(c, r)
-		if err != nil {
-			return err
+		select {
+		case core.Event.Event_RoleCreate <- r:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil
@@ -82,15 +80,14 @@ func (this *Role) RoleEdit(c *gin.Context, j ApiRoleEdit) (error) {
 			return result.Error
 		}
 
-		// Role Edit Hook for module
+		// Role Edit Event for module
 		r, err := this.Role_InterfaceToRole(form)
 		if err != nil {
 			return err
 		}
-		var hook module.Hook
-		err = hook.RoleEdit(c, r)
-		if err != nil {
-			return err
+		select {
+		case core.Event.Event_RoleEdit <- r:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil
@@ -159,11 +156,10 @@ func (this *Role) RoleDelete(c *gin.Context, ids []uint) (err error) {
 			return err
 		}
 
-		// Role Delete Hook for module
-		var hook module.Hook
-		err = hook.RoleDelete(c, r)
-		if err != nil {
-			return err
+		// Role Delete Event for module
+		select {
+		case core.Event.Event_RoleDelete <- r:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil

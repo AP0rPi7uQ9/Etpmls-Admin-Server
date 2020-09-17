@@ -4,7 +4,6 @@ import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
 	"Etpmls-Admin-Server/library"
-	"Etpmls-Admin-Server/module"
 	"encoding/json"
 	"errors"
 	"github.com/dchest/captcha"
@@ -161,15 +160,14 @@ func (this *User) UserCreate(c *gin.Context, j ApiUserCreate) (err error) {
 			return result.Error
 		}
 
-		// User Create Hook for module
+		// User Create Event
 		u, err := this.User_InterfaceToUser(form)
 		if err != nil {
 			return err
 		}
-		var hook module.Hook
-		err = hook.UserCreate(c, u)
-		if err != nil {
-			return err
+		select {
+		case core.Event.Event_UserCreate <- u:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil
@@ -218,15 +216,14 @@ func (this *User) UserEdit(c *gin.Context, j ApiUserEdit) (err error) {
 			return result.Error
 		}
 
-		// User Edit Hook for module
+		// User Edit Event for module
 		u, err := this.User_InterfaceToUser(form)
 		if err != nil {
 			return err
 		}
-		var hook module.Hook
-		err = hook.UserEdit(c, u)
-		if err != nil {
-			return err
+		select {
+		case core.Event.Event_UserEdit <- u:
+		case <- time.After(time.Second * 3):
 		}
 
 
@@ -267,11 +264,10 @@ func (this *User) UserDelete(c *gin.Context, ids []uint) (err error) {
 			return err
 		}
 
-		// User Delete Hook for module
-		var hook module.Hook
-		err = hook.UserDelete(c, u)
-		if err != nil {
-			return err
+		// User Delete Event for module
+		select {
+		case core.Event.Event_UserDelete <- u:
+		case <- time.After(time.Second * 3):
 		}
 
 		return nil
