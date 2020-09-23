@@ -184,12 +184,12 @@ func (this *Role) Role_InterfaceToRole(i interface{}) (Role, error) {
 	var r Role
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:对象转JSON失败! err:" + err.Error())
+		core.LogError.Output("Role_InterfaceToRole:Object to JSON failed! err:" + err.Error())
 		return Role{}, err
 	}
 	err = json.Unmarshal(us, &r)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:JSON转换对象失败! err:" + err.Error())
+		core.LogError.Output("Role_InterfaceToRole:JSON conversion object failed! err:" + err.Error())
 		return Role{}, err
 	}
 	return r, nil

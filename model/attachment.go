@@ -71,7 +71,7 @@ func (this *Attachment) AttachmentUploadImage(c *gin.Context, file *multipart.Fi
 	file_path := path + u + "." + extension
 	err = c.SaveUploadedFile(file, file_path)
 	if err != nil {
-		return p, errors.New("保存文件失败！")
+		return p, errors.New("Failed to save file!")
 	}
 
 	if err = database.DB.Create(&Attachment{Path: file_path}).Error; err != nil {
@@ -88,7 +88,7 @@ func (this *Attachment) AttachmentValidatePath(path string) error {
 	const upload_path = "storage/upload/"
 	// 截取前十五个字符判断和Path是否相同
 	if len(path) <= len(upload_path) || !strings.Contains(path[:len(upload_path)], upload_path) {
-		return  errors.New("请求路径非法！")
+		return  errors.New("Illegal request path!")
 	}
 	// 删除前缀
 	// p := strings.TrimPrefix(path, upload_path)
@@ -101,7 +101,7 @@ func (this *Attachment) AttachmentValidatePath(path string) error {
 	}
 	// 如果文件是目录
 	if f.IsDir() {
-		return errors.New("无法删除目录！")
+		return errors.New("Cannot delete directory!")
 	}
 	return nil
 }

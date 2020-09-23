@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"strings"
 	"time"
 )
 
@@ -31,18 +30,14 @@ type ApiPermissionCreate struct {
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt gorm.DeletedAt `json:"-"`
 	Name string `json:"name" binding:"required" validate:"max=255"`
-	Method string `json:"-"`
+	Method string `json:"method" binding:"required" validate:"min=1"`
 	Path	string	`json:"path" binding:"required" validate:"max=255"`
 	Remark string `json:"remark"`
-	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
 func (this *Permission)PermissionCreate(c *gin.Context, j ApiPermissionCreate) (error) {
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
 		type Permission ApiPermissionCreate
 		form := Permission(j)
-
-		// []string -> string
-		form.Method = strings.Join(form.TmpMethod, ",")
 
 		// Insert Data
 		result := tx.Create(&form)
@@ -109,18 +104,15 @@ type ApiPermissionEdit struct {
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt gorm.DeletedAt `json:"-"`
 	Name string `json:"name" binding:"required" validate:"max=255"`
-	Method string `json:"-"`
+	Method string `json:"method" binding:"required" validate:"min=1"`
 	Path	string	`json:"path" binding:"required" validate:"max=255"`
 	Remark string `json:"remark"`
-	TmpMethod []string `gorm:"-" json:"method" binding:"required" validate:"min=1"`
 }
 func (this *Permission) PermissionEdit(c *gin.Context, j ApiPermissionEdit) (error) {
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
 		type Permission ApiPermissionEdit
 		form := Permission(j)
 
-		// []string -> string
-		form.Method = strings.Join(form.TmpMethod, ",")
 
 		result := tx.Save(&form)
 		if result.Error != nil {
@@ -196,12 +188,12 @@ func (this *Permission) Permission_InterfaceToPermission(i interface{}) (Permiss
 	var p Permission
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:对象转JSON失败! err:" + err.Error())
+		core.LogError.Output("Permission_InterfaceToPermission:Object to JSON failed! err:" + err.Error())
 		return Permission{}, err
 	}
 	err = json.Unmarshal(us, &p)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:JSON转换对象失败! err:" + err.Error())
+		core.LogError.Output("Permission_InterfaceToPermission:JSON conversion object failed! err:" + err.Error())
 		return Permission{}, err
 	}
 	return p, nil

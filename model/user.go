@@ -580,12 +580,12 @@ func (this *User) User_InterfaceToUser(i interface{}) (User, error) {
 	var u User
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:对象转JSON失败! err:" + err.Error())
+		core.LogError.Output("User_InterfaceToUser:Object to JSON failed! err:" + err.Error())
 		return User{}, err
 	}
 	err = json.Unmarshal(us, &u)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:JSON转换对象失败! err:" + err.Error())
+		core.LogError.Output("User_InterfaceToUser:JSON conversion object failed! err:" + err.Error())
 		return User{}, err
 	}
 	return u, nil

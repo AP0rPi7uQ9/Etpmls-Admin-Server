@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 
@@ -111,12 +112,36 @@ func PermissionCheck(c *gin.Context, idStr string) (b bool, err error) {
 	}
 	uri := tmpUri.Path
 
-	// 遍历对比
+	// Determine whether there is a request permission
+	// 判断是否有请求权限
 	for _, v := range r {
 		for _, subv := range v.Permissions {
+
+			// define an empty slice
+			// 定义一个空切片
+			var mtd = []string{}
+			mtd = strings.Split(subv.Method, ",")
+
+			// Path comparison
+			// 路径对比
 			b, _ := filepath.Match(subv.Path, uri)
 			if b {
-				return true, nil
+
+				// Method comparison
+				// 方法对比
+				for _, mtdv := range mtd {
+					// If it is ALL, return the permission verification success directly
+					// 如果是ALL直接返回权限验证成功
+					if mtdv == "ALL" {
+						return true, nil
+					}
+					// If the method is the same as the current request, return the verification success
+					// 如果与当前请求方法相同，返回验证成功
+					if mtdv == c.Request.Method {
+						return true, nil
+					}
+				}
+
 			}
 		}
 	}
