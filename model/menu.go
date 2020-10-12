@@ -28,7 +28,7 @@ func (this *Menu) MenuCreate(j ApiMenuCreate) (error) {
 	// 移动文件
 	err := os.Rename("storage/menu/menu.json", "storage/menu/menu.json.bak")
 	if err != nil {
-		core.LogError.AutoOutputDebug("备份菜单文件失败！", err)
+		core.LogError.Output(core.ErrorWithLineNum("Failed to backup menu file!" + err.Error()))
 		return err
 	}
 
@@ -37,12 +37,12 @@ func (this *Menu) MenuCreate(j ApiMenuCreate) (error) {
 	var s = []byte(j.Menu)
 	err = ioutil.WriteFile("storage/menu/menu.json", s, 0666)
 	if err != nil {
-		core.LogError.AutoOutputDebug("写入菜单文件失败！", err)
+		core.LogError.Output(core.ErrorWithLineNum("Failed to write menu file!" + err.Error()))
 
 		// 还原历史菜单
 		err2 := os.Rename("storage/menu/menu.json.bak", "storage/menu/menu.json")
 		if err2 != nil {
-			core.LogError.AutoOutputDebug("备份菜单文件还原失败！", err2)
+			core.LogError.Output(core.ErrorWithLineNum("Failed to restore the backup menu file!" + err2.Error()))
 		}
 
 		return err
@@ -75,14 +75,14 @@ func (this *Menu) menu_GetAll_Cache() (interface{}, error) {
 		if err == redis.Nil {
 			return this.menu_GetAll_NoCache()
 		}
-		core.LogError.Output(err)
+		core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 		return nil, err
 	}
 
 	var j interface{}
 	err = json.Unmarshal([]byte(ctx), &j)
 	if err != nil {
-		core.LogError.Output(err)
+		core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 		library.Cache.DeleteString(core.Cache_MenuGetAll)
 		return nil, err
 	}
@@ -91,6 +91,7 @@ func (this *Menu) menu_GetAll_Cache() (interface{}, error) {
 func (this *Menu) menu_GetAll_NoCache() (interface{}, error) {
 	ctx, err := ioutil.ReadFile("./storage/menu/menu.json")
 	if err != nil {
+		core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 		return nil, err
 	}
 	// Save menu
@@ -102,6 +103,7 @@ func (this *Menu) menu_GetAll_NoCache() (interface{}, error) {
 	var j interface{}
 	err = json.Unmarshal(ctx, &j)
 	if err != nil {
+		core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 		return nil, err
 	}
 

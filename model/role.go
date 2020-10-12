@@ -40,12 +40,14 @@ func (this *Role) RoleCreate(c *gin.Context, j ApiRoleCreate) (error) {
 		// Insert Data
 		result := tx.Create(&form)
 		if result.Error != nil {
+			core.LogError.Output(core.ErrorWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// Role Create Event for module
 		r, err := this.Role_InterfaceToRole(form)
 		if err != nil {
+			core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -80,12 +82,14 @@ func (this *Role) RoleEdit(c *gin.Context, j ApiRoleEdit) (error) {
 		form := Role(j)
 		result := tx.Save(&form)
 		if result.Error != nil {
+			core.LogError.Output(core.ErrorWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// Role Edit Event for module
 		r, err := this.Role_InterfaceToRole(form)
 		if err != nil {
+			core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -147,18 +151,21 @@ func (this *Role) RoleDelete(c *gin.Context, ids []uint) (err error) {
 		// 删除角色
 		result := tx.Where("id IN ?", ids).Delete(&Role{})
 		if result.Error != nil {
+			core.LogError.Output(core.ErrorWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// 删除关联
 		err = tx.Model(&r).Association("Users").Clear()
 		if err != nil {
+			core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 			return err
 		}
 
 		// 删除关联
 		err = tx.Model(&r).Association("Permissions").Clear()
 		if err != nil {
+			core.LogError.Output(core.ErrorWithLineNum(err.Error()))
 			return err
 		}
 
@@ -184,12 +191,12 @@ func (this *Role) Role_InterfaceToRole(i interface{}) (Role, error) {
 	var r Role
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output("Role_InterfaceToRole:Object to JSON failed! err:" + err.Error())
+		core.LogError.Output(core.ErrorWithLineNum("Object to JSON failed!" + err.Error()))
 		return Role{}, err
 	}
 	err = json.Unmarshal(us, &r)
 	if err != nil {
-		core.LogError.Output("Role_InterfaceToRole:JSON conversion object failed! err:" + err.Error())
+		core.LogError.Output(core.ErrorWithLineNum("JSON conversion object failed!" + err.Error()))
 		return Role{}, err
 	}
 	return r, nil

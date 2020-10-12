@@ -6,6 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"os"
+	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -37,7 +40,8 @@ func GetToken(c *gin.Context) (token string, err error) {
 		return token, err
 	}
 
-	return token, errors.New("Token获取失败！")
+	LogError.Output(ErrorWithLineNum("Token acquisition failed!"))
+	return token, errors.New("Token acquisition failed！")
 }
 
 
@@ -49,4 +53,24 @@ func Translate(c *gin.Context, ctx string) string {
 		lang = "en"
 	}
 	return library.I18n.Translate(ctx, lang)
+}
+
+
+// Error with line number
+// 错误带行号
+func ErrorWithLineNum(err string) string {
+	_, file, _, _ := runtime.Caller(0)
+	dir := filepath.Dir(filepath.Dir(file))
+	sourceDir := strings.ReplaceAll(dir, "\\", "/")
+
+	var list []string
+	for i := 1 ; i < 20; i++ {
+		_, file, line, ok := runtime.Caller(i)
+		if ok && strings.HasPrefix(file, sourceDir) {
+			list = append(list, file + ":" + strconv.Itoa(line))
+		} else {
+			break
+		}
+	}
+	return strings.Join(list, " => ") + " => Error: " + err
 }
