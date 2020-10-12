@@ -40,7 +40,7 @@ func GetToken(c *gin.Context) (token string, err error) {
 		return token, err
 	}
 
-	LogError.Output(ErrorWithLineNum("Token acquisition failed!"))
+	LogError.Output(MessageWithLineNum("Token acquisition failed!"))
 	return token, errors.New("Token acquisition failed！")
 }
 
@@ -56,9 +56,9 @@ func Translate(c *gin.Context, ctx string) string {
 }
 
 
-// Error with line number
-// 错误带行号
-func ErrorWithLineNum(err string) string {
+// Message(or Error) with line number
+// 消息(或错误)带行号
+func MessageWithLineNum(msg string) string {
 	_, file, _, _ := runtime.Caller(0)
 	dir := filepath.Dir(filepath.Dir(file))
 	sourceDir := strings.ReplaceAll(dir, "\\", "/")
@@ -72,5 +72,5 @@ func ErrorWithLineNum(err string) string {
 			break
 		}
 	}
-	return strings.Join(list, " => ") + " => Error: " + err
+	return strings.Join(list, " => ") + " => Message: " + msg
 }

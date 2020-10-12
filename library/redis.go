@@ -80,6 +80,12 @@ func (this *Redis) DeleteHash (key string, list ...string) {
 }
 
 
+// Clear all caches in the current DB
+// 清除当前DB内所有缓存
+func (this *Redis) ClearAllCache() {
+	RedisClient.FlushDB(context.Background())
+	return
+}
 
 
 

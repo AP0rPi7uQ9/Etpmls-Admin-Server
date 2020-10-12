@@ -35,4 +35,5 @@ type Interface_Cache interface {
 	GetHash (key string, field string) (string, error)
 	SetHash (key string, value map[string]string)
 	DeleteHash (key string, list ...string)
+	ClearAllCache()
 }
