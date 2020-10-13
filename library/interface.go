@@ -33,7 +33,7 @@ type Interface_Cache interface {
 	SetString (key string, value string, time time.Duration)
 	DeleteString (list ...string)
 	GetHash (key string, field string) (string, error)
-	SetHash (key string, value map[string]string)
+	SetHash (key string, value interface{})
 	DeleteHash (key string, list ...string)
 	ClearAllCache()
 }

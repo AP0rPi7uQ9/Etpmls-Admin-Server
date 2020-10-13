@@ -66,7 +66,7 @@ func (this *Redis) GetHash (key string, field string) (string, error) {
 
 // Set Hash
 // 设置哈希
-func (this *Redis) SetHash (key string, value map[string]string) {
+func (this *Redis) SetHash (key string, value interface{}) {
 	_ = RedisClient.HSet(context.Background(), key, value).Err()
 	return
 }
