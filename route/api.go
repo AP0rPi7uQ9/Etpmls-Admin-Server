@@ -51,6 +51,11 @@ func RouteApi(r *gin.Engine)  {
 				attachment.POST("/uploadImage", v3.AttachmentUploadImage)
 				attachment.DELETE("/deleteImage", v3.AttachmentDeleteImage)
 			}
+			setting := version2.Group("/setting", middleware.RoleCheck())
+			{
+				setting.GET("/clearCache", v3.SettingClearCache)
+				setting.GET("/diskCleanup", v3.SettingDiskCleanup)
+			}
 		}
 	}
 }

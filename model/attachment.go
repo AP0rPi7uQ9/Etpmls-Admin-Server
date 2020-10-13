@@ -99,11 +99,10 @@ func (this *Attachment) AttachmentValidatePath(path string) error {
 	// p := strings.TrimPrefix(path, upload_path)
 	f, err := os.Stat(path)
 	if err != nil {
+		core.LogError.Output(core.MessageWithLineNum(err.Error()))
 		if os.IsNotExist(err) {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
 			return nil
 		}
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
 		return err
 	}
 	// 如果文件是目录
@@ -148,7 +147,6 @@ func (this *Attachment) AttachmentBatchDelete(s []string) (err error) {
 		// Validate If a File
 		err = this.AttachmentValidatePath(v)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
 			return err
 		}
 		// Delete Image
@@ -164,4 +162,30 @@ func (this *Attachment) AttachmentBatchDelete(s []string) (err error) {
 	return err
 }
 
+
+// Delete unused attachments
+// 删除未使用的附件
+func (this *Attachment) DeleteUnused() error {
+	var a []Attachment
+	database.DB.Debug().Where("owner_id = ?", 0).Or("owner_type = ?", "").Find(&a)
+
+	// If there is no value, return directly
+	// 如果没有值，则直接返回
+	if len(a) == 0 {
+		core.LogDebug.Output(core.MessageWithLineNum("No files need to be deleted!"))
+		return nil
+	}
+
+	var pt []string
+	for _, v := range a {
+		pt = append(pt, v.Path)
+	}
+
+	err := this.AttachmentBatchDelete(pt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 

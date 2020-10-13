@@ -28,6 +28,13 @@
     },
     "name": "Menu",
     "path": "menu"
+  }, {
+    "component": "views/etpmls-admin/setting/index",
+    "meta": {
+      "title": "setting"
+    },
+    "name": "Setting",
+    "path": "setting"
   }],
   "component": "Layout",
   "meta": {

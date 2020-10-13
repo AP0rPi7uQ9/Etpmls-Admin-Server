@@ -41,7 +41,7 @@ func InsertBasicDataToDatabase()  {
 	// Create Role
 	role := database.Role{
 		Name:        "Administrator",
-		Remark: "系统管理员",
+		Remark: "System Administrator",
 	}
 	if err := database.DB.Debug().Create(&role).Error; err != nil {
 		library.Log.Error("utils/initialization/init_database.go:", err)
@@ -65,10 +65,10 @@ func InsertBasicDataToDatabase()  {
 	// Create Permission
 	permission := []database.Permission{
 		{
-			Name: "查看用户",
+			Name: "View User",
 			Method: "GET",
 			Path: "/api/*/user/getAll",
-			Remark: "查看用户列表",
+			Remark: "View user list",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
@@ -76,7 +76,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "创建用户",
+			Name: "Create User",
 			Method: "POST",
 			Path: "/api/*/user/create",
 			Roles: []database.Role{
@@ -86,7 +86,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "编辑用户",
+			Name: "Edit User",
 			Method: "PUT",
 			Path: "/api/*/user/edit",
 			Roles: []database.Role{
@@ -96,7 +96,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "删除用户",
+			Name: "Delete User",
 			Method: "DELETE",
 			Path: "/api/*/user/delete",
 			Roles: []database.Role{
@@ -106,10 +106,10 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "查看角色",
+			Name: "View Role",
 			Method: "GET",
 			Path: "/api/*/role/getAll",
-			Remark: "查看角色列表",
+			Remark: "View role list",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
@@ -117,7 +117,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "创建角色",
+			Name: "Create Role",
 			Method: "POST",
 			Path: "/api/*/role/create",
 			Roles: []database.Role{
@@ -127,7 +127,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "编辑角色",
+			Name: "Edit Role",
 			Method: "PUT",
 			Path: "/api/*/role/edit",
 			Roles: []database.Role{
@@ -137,7 +137,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "删除角色",
+			Name: "Delete Role",
 			Method: "DELETE",
 			Path: "/api/*/role/delete",
 			Roles: []database.Role{
@@ -147,10 +147,10 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "查看权限",
+			Name: "View Permission",
 			Method: "GET",
 			Path: "/api/*/permission/getAll",
-			Remark: "查看权限列表",
+			Remark: "View permission list",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
@@ -158,7 +158,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "创建权限",
+			Name: "Create Permission",
 			Method: "POST",
 			Path: "/api/*/permission/create",
 			Roles: []database.Role{
@@ -168,7 +168,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "编辑权限",
+			Name: "Edit Permission",
 			Method: "PUT",
 			Path: "/api/*/permission/edit",
 			Roles: []database.Role{
@@ -178,7 +178,7 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "删除权限",
+			Name: "Delete Permission",
 			Method: "DELETE",
 			Path: "/api/*/permission/delete",
 			Roles: []database.Role{
@@ -188,9 +188,29 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
-			Name: "创建/编辑菜单",
+			Name: "Create/Edit Menu",
 			Method: "POST",
 			Path: "/api/*/menu/create",
+			Roles: []database.Role{
+				{
+					Model:       gorm.Model{ID:1},
+				},
+			},
+		},
+		{
+			Name: "Clear Cache",
+			Method: "GET",
+			Path: "/api/*/setting/clearCache",
+			Roles: []database.Role{
+				{
+					Model:       gorm.Model{ID:1},
+				},
+			},
+		},
+		{
+			Name: "Disk Cleanup",
+			Method: "GET",
+			Path: "/api/*/setting/diskCleanup",
 			Roles: []database.Role{
 				{
 					Model:       gorm.Model{ID:1},
