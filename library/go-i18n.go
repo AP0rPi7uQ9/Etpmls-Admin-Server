@@ -20,7 +20,7 @@ func init() {
 
 	list, err := filepath.Glob("./storage/language/*.toml")
 	if err != nil || len(list) < 1 {
-		Log.Error("Failed to load language pack!")
+		Library_Logrus.Error("Failed to load language pack!")
 		return
 	}
 

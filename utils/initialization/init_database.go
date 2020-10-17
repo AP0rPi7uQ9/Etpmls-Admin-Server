@@ -17,7 +17,7 @@ import (
 func InitDatabase()  {
 	env, err := godotenv.Read("./.env")
 	if err != nil {
-		library.Log.Error(err)
+		library.Library_Logrus.Error(err)
 		return
 	}
 
@@ -32,7 +32,7 @@ func InitDatabase()  {
 
 	err = godotenv.Write(env, "./.env")
 	if err != nil {
-		library.Log.Error(err)
+		library.Library_Logrus.Error(err)
 		return
 	}
 }
@@ -44,7 +44,7 @@ func InsertBasicDataToDatabase()  {
 		Remark: "System Administrator",
 	}
 	if err := database.DB.Debug().Create(&role).Error; err != nil {
-		library.Log.Error("utils/initialization/init_database.go:", err)
+		library.Library_Logrus.Error("utils/initialization/init_database.go:", err)
 	}
 
 
@@ -59,7 +59,7 @@ func InsertBasicDataToDatabase()  {
 		},
 	}
 	if err := database.DB.Debug().Set("gorm:association_autoupdate", false).Set("gorm:association_autocreate", false).Create(&user).Error; err != nil {
-		library.Log.Error("utils/initialization/init_database.go:", err)
+		library.Library_Logrus.Error("utils/initialization/init_database.go:", err)
 	}
 
 	// Create Permission
@@ -220,6 +220,6 @@ func InsertBasicDataToDatabase()  {
 
 	}
 	if err := database.DB.Debug().Set("gorm:association_autoupdate", false).Set("gorm:association_autocreate", false).Create(&permission).Error; err != nil {
-		library.Log.Error("utils/initialization/init_database.go:", err)
+		library.Library_Logrus.Error("utils/initialization/init_database.go:", err)
 	}
 }

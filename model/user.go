@@ -494,7 +494,7 @@ func (this *User) user_GetCurrent_NotCache(c *gin.Context) (interface{}, error) 
 		if err != nil {
 			core.LogError.Output(err)
 		} else {
-			var m = make(map[string]interface{})
+			var m = make(map[string]string)
 			m[strconv.Itoa(int(u.ID))] = string(b)
 			library.Cache.SetHash(core.Cache_UserGetCurrent, m)
 		}

@@ -2,25 +2,8 @@ package core
 
 import (
 	"Etpmls-Admin-Server/library"
-	"errors"
 	"fmt"
-)
-
-var (
-	LogPanic = OutputLog{Level:PanicLevel}
-	LogFatal = OutputLog{Level:FatalLevel}
-	LogError = OutputLog{Level:ErrorLevel}
-	LogWarn = OutputLog{Level:WarnLevel}
-	LogInfo = OutputLog{Level:InfoLevel}
-	LogDebug = OutputLog{Level:DebugLevel}
-	LogTrace = OutputLog{Level:TraceLevel}
-)
-
-
-const (
-	LOG_MODE_ONLY = 1
-	CONSOLE_MODE_ONLY = 2
-	LOG_CONSOLE_MODE = 3
+	"strings"
 )
 
 type Level uint32
@@ -34,43 +17,81 @@ const (
 	TraceLevel
 )
 
-
-
-// Debug errors and custom errors are used as parameters at the same time, and appropriate errors are output according to environment variables.
-// 把Debug错误和自定义错误同时作为参数，根据环境变量输出适合的错误。
-func GetErrorByIfDebug(err error, msg string) error {
-	if IsDebug() {
-		return errors.New(msg)
+// Parse log level
+// 解析log等级
+func ParseLogLevel(str string) (Level, error) {
+	switch strings.ToLower(str) {
+	case "panic":
+		return PanicLevel, nil
+	case "fatal":
+		return FatalLevel, nil
+	case "error":
+		return ErrorLevel, nil
+	case "warn", "warning":
+		return WarnLevel, nil
+	case "info":
+		return InfoLevel, nil
+	case "debug":
+		return DebugLevel, nil
+	case "trace":
+		return TraceLevel, nil
 	}
-	return err
+
+	var l Level
+	return l, fmt.Errorf("Not a valid log Level: %q", str)
 }
 
-// Generate errors with both custom messages and error messages
-// 生成同时带有自定义信息和错误信息的错误
-func GenerateErrorWithMessage(msg string, err error) error {
-	return errors.New(msg + err.Error())
-}
+
+const (
+	LOG_MODE_ONLY = 1
+	CONSOLE_MODE_ONLY = 2
+	LOG_CONSOLE_MODE = 3
+)
+
+
+var (
+	LogPanic = OutputLog{Level:PanicLevel}
+	LogFatal = OutputLog{Level:FatalLevel}
+	LogError = OutputLog{Level:ErrorLevel}
+	LogWarn = OutputLog{Level:WarnLevel}
+	LogInfo = OutputLog{Level:InfoLevel}
+	LogDebug = OutputLog{Level:DebugLevel}
+	LogTrace = OutputLog{Level:TraceLevel}
+)
 
 
 type OutputLog struct {
 	Level Level
 }
 
+
 // No matter whether it is in Debug mode, it will output an message
 // 无论是否为Debug模式，都输出信息
 func (o OutputLog) Output (info interface{}) {
+	l, err := ParseLogLevel(library.Config.Log.Level)
+	if err != nil {
+		library.Log.Panic(MessageWithLineNum("Error in the log function!"))
+		return
+	}
+
 	switch o.Level {
 	case PanicLevel:
 		switch library.Config.Log.Panic {
 		case LOG_MODE_ONLY:
 			library.Log.Panic(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Panic(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Panic(info)
 		}
 
@@ -79,12 +100,18 @@ func (o OutputLog) Output (info interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Fatal(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Fatal(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Fatal(info)
 		}
 
@@ -93,12 +120,18 @@ func (o OutputLog) Output (info interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Error(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Error(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Error(info)
 		}
 
@@ -107,12 +140,18 @@ func (o OutputLog) Output (info interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Warning(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Warning(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Warning(info)
 		}
 
@@ -121,12 +160,18 @@ func (o OutputLog) Output (info interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Info(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Info(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Info(info)
 		}
 
@@ -135,12 +180,18 @@ func (o OutputLog) Output (info interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Debug(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Debug(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Debug(info)
 		}
 
@@ -149,21 +200,34 @@ func (o OutputLog) Output (info interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Trace(info)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Trace(info)
 		default:
-			fmt.Println(info)
+			if l >= o.Level {
+				fmt.Println(info)
+			}
 			library.Log.Trace(info)
 		}
 
 	}
 }
 
+
 // If it is currently in Debug mode, it will output an return message, if it is in production mode, it will output a custom message
 // 若当前为Debug模式，则输出返回信息，若为生产模式，则输出自定义信息
 func (o OutputLog) OutputDebug (err error, msg interface{}) {
+	l, err := ParseLogLevel(library.Config.Log.Level)
+	if err != nil {
+		library.Log.Panic(MessageWithLineNum("Error in the log function!"))
+		return
+	}
+
 	var m interface{}
 	if IsDebug() {
 		m = err
@@ -177,12 +241,19 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Panic(m)
 		case CONSOLE_MODE_ONLY:
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			fmt.Println(m)
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Panic(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Panic(m)
 		}
 
@@ -191,12 +262,18 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Fatal(m)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Fatal(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Fatal(m)
 		}
 
@@ -205,12 +282,18 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Error(m)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Error(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Error(m)
 		}
 
@@ -219,12 +302,18 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Warning(m)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Warning(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Warning(m)
 		}
 
@@ -233,12 +322,18 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Info(m)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Info(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Info(m)
 		}
 
@@ -247,12 +342,18 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Debug(m)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Debug(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Debug(m)
 		}
 
@@ -261,17 +362,24 @@ func (o OutputLog) OutputDebug (err error, msg interface{}) {
 		case LOG_MODE_ONLY:
 			library.Log.Trace(m)
 		case CONSOLE_MODE_ONLY:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 		case LOG_CONSOLE_MODE:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Trace(m)
 		default:
-			fmt.Println(m)
+			if l >= o.Level {
+				fmt.Println(m)
+			}
 			library.Log.Trace(m)
 		}
 
 	}
 }
+
 
 // Automatically output Debug, if it is a debug environment, it will output custom information + Error, if it is not a Debug environment, it will output custom information
 // 自动输出Debug，如果是debug环境，则输出自定义信息+Error，如果不是Debug环境，输出自定义信息

@@ -30,14 +30,14 @@ func initYaml()  {
 
 		b, err := ioutil.ReadFile(yamlPath)
 		if err != nil {
-			library.Log.Error("Failed to read the configuration file! Error:", err)
+			library.Library_Logrus.Error("Failed to read the configuration file! Error:", err)
 			continue
 		}
 
 		library.Config_Module[v] = make(map[interface{}]interface{})
 		err = yaml.Unmarshal(b, library.Config_Module[v])
 		if err != nil {
-			library.Log.Error("Failed to unmarshal the configuration file! Error:", err)
+			library.Library_Logrus.Error("Failed to unmarshal the configuration file! Error:", err)
 			continue
 		}
 	}

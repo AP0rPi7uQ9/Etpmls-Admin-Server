@@ -6,6 +6,7 @@ var (
 	Jwt_Token = Interface_Jwt(&JwtGo{MySigningKey: []byte(Config.App.Key)})
 	I18n = Interface_I18n(&Go_i18n{})
 	Cache = Interface_Cache(&Redis{})
+	Log = Interface_Log(&Logrus{})
 )
 
 
@@ -33,7 +34,20 @@ type Interface_Cache interface {
 	SetString (key string, value string, time time.Duration)
 	DeleteString (list ...string)
 	GetHash (key string, field string) (string, error)
-	SetHash (key string, value interface{})
+	SetHash (key string, value map[string]string)
 	DeleteHash (key string, list ...string)
 	ClearAllCache()
+}
+
+
+// Library_Logrus interface
+// 日志接口
+type Interface_Log interface {
+	Panic(args ...interface{})
+	Fatal(args ...interface{})
+	Error(args ...interface{})
+	Warning(args ...interface{})
+	Info(args ...interface{})
+	Debug(args ...interface{})
+	Trace(args ...interface{})
 }

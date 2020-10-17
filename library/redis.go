@@ -24,9 +24,9 @@ func InitRedis()  {
 
 	_, err := RedisClient.Ping(context.TODO()).Result()
 	if err != nil {
-		Log.Warning("Redis initialization failed.")
+		Library_Logrus.Warning("Redis initialization failed.")
 	} else {
-		Log.Info("Redis initialized successfully.")
+		Library_Logrus.Info("Redis initialized successfully.")
 	}
 }
 
@@ -66,8 +66,12 @@ func (this *Redis) GetHash (key string, field string) (string, error) {
 
 // Set Hash
 // 设置哈希
-func (this *Redis) SetHash (key string, value interface{}) {
-	_ = RedisClient.HSet(context.Background(), key, value).Err()
+func (this *Redis) SetHash (key string, value map[string]string) {
+	var tmp = make(map[string]interface{})
+	for k, v := range value {
+		tmp[k] = v
+	}
+	_ = RedisClient.HSet(context.Background(), key, tmp).Err()
 	return
 }
 

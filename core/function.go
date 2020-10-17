@@ -74,3 +74,20 @@ func MessageWithLineNum(msg string) string {
 	}
 	return strings.Join(list, " => ") + " => Message: " + msg
 }
+
+
+// Debug errors and custom errors are used as parameters at the same time, and appropriate errors are output according to environment variables.
+// 把Debug错误和自定义错误同时作为参数，根据环境变量输出适合的错误。
+func GetErrorByIfDebug(err error, msg string) error {
+	if IsDebug() {
+		return err
+	}
+	return errors.New(msg)
+}
+
+
+// Generate errors with both custom messages and error messages
+// 生成同时带有自定义信息和错误信息的错误
+func GenerateErrorWithMessage(msg string, err error) error {
+	return errors.New(msg + err.Error())
+}
