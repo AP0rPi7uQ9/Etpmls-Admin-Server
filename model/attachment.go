@@ -167,7 +167,7 @@ func (this *Attachment) AttachmentBatchDelete(s []string) (err error) {
 // 删除未使用的附件
 func (this *Attachment) DeleteUnused() error {
 	var a []Attachment
-	database.DB.Debug().Where("owner_id = ?", 0).Or("owner_type = ?", "").Find(&a)
+	database.DB.Where("owner_id = ?", 0).Or("owner_type = ?", "").Find(&a)
 
 	// If there is no value, return directly
 	// 如果没有值，则直接返回
