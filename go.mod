@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/go-redis/redis/v8 v8.0.0-beta.3
 	github.com/google/uuid v1.1.1
+	github.com/hashicorp/consul/api v1.7.0
 	github.com/jinzhu/gorm v1.9.12 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/nicksnyder/go-i18n/v2 v2.0.3

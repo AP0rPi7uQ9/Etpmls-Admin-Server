@@ -63,4 +63,5 @@ func init()  {
 	init_Yaml()
 	init_Logrus()
 	init_Redis()
+	init_Consul()
 }

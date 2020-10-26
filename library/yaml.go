@@ -44,6 +44,17 @@ type configuration struct {
 		Password string
 		DB int
 	}
+	ServiceDiscovery struct{
+		Address string
+		Service struct{
+			Name string
+			Address string
+			Port int
+			Tag []string
+			CheckInterval string	`yaml:"check-interval"`
+			CheckUrl string	`yaml:"check-url"`
+		}
+	}	`yaml:"service-discovery"`
 	Field struct{
 		Api struct{
 			Code string

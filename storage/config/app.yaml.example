@@ -65,6 +65,17 @@ cache:
   # [Required] Cache server DB (such as: 1)
   # [必填] 缓存服务器DB(如：1)
   db: 1
+service-discovery:
+  # [Required] Service discovery server address (eg: localhost:8500)
+  # [必填] 服务发现服务器地址(如：localhost:8500)
+  address: 192.168.3.220:8500
+  service:
+    name: MainService
+    address: 127.0.0.1
+    port: 8080
+    tag: ["primary"]
+    check-interval: "5s"
+    check-url: "http://127.0.0.1/health"
 field:
   api:
     # [Required] The following are the custom field names returned by the API, which can be customized to adapt to different front-end frameworks (eg: msg)
