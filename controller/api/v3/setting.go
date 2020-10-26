@@ -4,6 +4,7 @@ import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/library"
 	"Etpmls-Admin-Server/model"
+	"Etpmls-Admin-Server/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,7 +20,7 @@ func SettingClearCache(c *gin.Context)  {
 	}
 
 	library.Cache.ClearAllCache()
-	core.LogDebug.Output(core.MessageWithLineNum("Cleared all cache!"))
+	core.LogDebug.Output(utils.MessageWithLineNum("Cleared all cache!"))
 	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Delete"), nil)
 }
 
@@ -34,6 +35,6 @@ func SettingDiskCleanup(c *gin.Context)  {
 		return
 	}
 
-	core.LogDebug.Output(core.MessageWithLineNum("Disk cleanup complete!"))
+	core.LogDebug.Output(utils.MessageWithLineNum("Disk cleanup complete!"))
 	core.JsonSuccess(c, http.StatusOK, core.SUCCESS_Code, core.Translate(c, "SUCCESS_MESSAGE_Delete"), nil)
 }

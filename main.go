@@ -11,8 +11,6 @@ import (
 )
 
 func main() {
-	library.InitLogrus()
-	library.InitRedis()
 	initialization.InitDatabase()
 	module.InitModule()
 	router := initRoute()

@@ -3,6 +3,7 @@ package model
 import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
+	"Etpmls-Admin-Server/utils"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -40,14 +41,14 @@ func (this *Role) RoleCreate(c *gin.Context, j ApiRoleCreate) (error) {
 		// Insert Data
 		result := tx.Create(&form)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// Role Create Event for module
 		r, err := this.Role_InterfaceToRole(form)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -82,14 +83,14 @@ func (this *Role) RoleEdit(c *gin.Context, j ApiRoleEdit) (error) {
 		form := Role(j)
 		result := tx.Save(&form)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// Role Edit Event for module
 		r, err := this.Role_InterfaceToRole(form)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -151,21 +152,21 @@ func (this *Role) RoleDelete(c *gin.Context, ids []uint) (err error) {
 		// 删除角色
 		result := tx.Where("id IN ?", ids).Delete(&Role{})
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// 删除关联
 		err = tx.Model(&r).Association("Users").Clear()
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 
 		// 删除关联
 		err = tx.Model(&r).Association("Permissions").Clear()
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 
@@ -191,12 +192,12 @@ func (this *Role) Role_InterfaceToRole(i interface{}) (Role, error) {
 	var r Role
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum("Object to JSON failed!" + err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum("Object to JSON failed!" + err.Error()))
 		return Role{}, err
 	}
 	err = json.Unmarshal(us, &r)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum("JSON conversion object failed!" + err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum("JSON conversion object failed!" + err.Error()))
 		return Role{}, err
 	}
 	return r, nil

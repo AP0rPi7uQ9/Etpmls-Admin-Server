@@ -3,10 +3,11 @@ package library
 import "time"
 
 var (
-	Jwt_Token = Interface_Jwt(&JwtGo{MySigningKey: []byte(Config.App.Key)})
-	I18n = Interface_I18n(&Go_i18n{})
-	Cache = Interface_Cache(&Redis{})
-	Log = Interface_Log(&Logrus{})
+	JwtToken = Interface_Jwt(NewJwtToken(Config.App.Key))
+	I18n     = Interface_I18n(&Go_i18n{})
+	Cache    = Interface_Cache(NewCache())
+	Log      = Interface_Log(NewLog())
+	Captcha  = Interface_Captcha(NewCaptcha())
 )
 
 
@@ -40,7 +41,7 @@ type Interface_Cache interface {
 }
 
 
-// Library_Logrus interface
+// Instance_Logrus interface
 // 日志接口
 type Interface_Log interface {
 	Panic(args ...interface{})
@@ -50,4 +51,16 @@ type Interface_Log interface {
 	Info(args ...interface{})
 	Debug(args ...interface{})
 	Trace(args ...interface{})
+}
+
+// Captcha interface
+// 验证码接口
+type Interface_Captcha interface {
+	Verify(string, string) bool
+}
+
+func init()  {
+	init_Yaml()
+	init_Logrus()
+	init_Redis()
 }

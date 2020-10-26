@@ -30,7 +30,7 @@ func BasicCheck() gin.HandlerFunc {
 
 		// Get Claims
 		// 获取Claims
-		_, err = library.Jwt_Token.ParseToken(token)
+		_, err = library.JwtToken.ParseToken(token)
 		if err != nil {
 			core.JsonError(c, http.StatusPaymentRequired, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_TokenVerificationFailed"), nil, err)
 			c.Abort()
@@ -58,7 +58,7 @@ func RoleCheck() gin.HandlerFunc {
 
 		// Get Claims
 		// 获取Claims
-		tmp, err := library.Jwt_Token.ParseToken(token)
+		tmp, err := library.JwtToken.ParseToken(token)
 		tk, ok := tmp.(*jwt.Token)
 		if !ok || err != nil {
 			core.JsonError(c, http.StatusPaymentRequired, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_TokenVerificationFailed"), nil, err)

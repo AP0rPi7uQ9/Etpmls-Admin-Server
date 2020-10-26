@@ -1,20 +1,20 @@
 package library
 
 import (
-	"github.com/sirupsen/logrus"
+	Package_Logrus "github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var Library_Logrus *logrus.Logger
+var Instance_Logrus *Package_Logrus.Logger
 
-func InitLogrus() {
-	Library_Logrus = logrus.New()
-	// Library_Logrus as JSON instead of the default ASCII formatter.
-	Library_Logrus.Formatter = new(logrus.JSONFormatter)
+func init_Logrus() {
+	Instance_Logrus = Package_Logrus.New()
+	// Instance_Logrus as JSON instead of the default ASCII formatter.
+	Instance_Logrus.Formatter = new(Package_Logrus.JSONFormatter)
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	Library_Logrus.Out = &lumberjack.Logger{
+	Instance_Logrus.Out = &lumberjack.Logger{
 		Filename:   "storage/log/app.log",
 		MaxSize:    500, // megabytes
 		MaxAge:     30, //days
@@ -22,58 +22,56 @@ func InitLogrus() {
 	}
 
 	// Only log the warning severity or above.
-	level, err := logrus.ParseLevel(Config.Log.Level)
+	level, err := Package_Logrus.ParseLevel(Config.Log.Level)
 	if err != nil {
-		level = logrus.WarnLevel
-		Library_Logrus.Warning("Set Library_Logrus Level Failed!")
+		level = Package_Logrus.WarnLevel
+		Instance_Logrus.Warning("Set Instance_Logrus Level Failed!")
 	} else {
-		Library_Logrus.Info("Logrus initialized successfully.")
+		Instance_Logrus.Info("logrus initialized successfully.")
 	}
-	Library_Logrus.Level = level
+	Instance_Logrus.Level = level
 }
 
-type Logrus struct {
+type logrus struct {
 
 }
 
-func (this *Logrus) Panic(args ...interface{}) {
-	Library_Logrus.Panic(args)
+func NewLog() *logrus {
+	return &logrus{}
+}
+
+func (this *logrus) Panic(args ...interface{}) {
+	Instance_Logrus.Panic(args)
 	return
 }
 
-
-func (this *Logrus) Fatal(args ...interface{}) {
-	Library_Logrus.Fatal(args)
+func (this *logrus) Fatal(args ...interface{}) {
+	Instance_Logrus.Fatal(args)
 	return
 }
 
-
-func (this *Logrus) Error(args ...interface{}) {
-	Library_Logrus.Error(args)
+func (this *logrus) Error(args ...interface{}) {
+	Instance_Logrus.Error(args)
 	return
 }
 
-
-func (this *Logrus) Warning(args ...interface{}) {
-	Library_Logrus.Warning(args)
+func (this *logrus) Warning(args ...interface{}) {
+	Instance_Logrus.Warning(args)
 	return
 }
 
-
-func (this *Logrus) Info(args ...interface{}) {
-	Library_Logrus.Info(args)
+func (this *logrus) Info(args ...interface{}) {
+	Instance_Logrus.Info(args)
 	return
 }
 
-
-func (this *Logrus) Debug(args ...interface{}) {
-	Library_Logrus.Debug(args)
+func (this *logrus) Debug(args ...interface{}) {
+	Instance_Logrus.Debug(args)
 	return
 }
 
-
-func (this *Logrus) Trace(args ...interface{}) {
-	Library_Logrus.Trace(args)
+func (this *logrus) Trace(args ...interface{}) {
+	Instance_Logrus.Trace(args)
 	return
 }
 

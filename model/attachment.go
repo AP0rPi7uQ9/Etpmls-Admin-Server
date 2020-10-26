@@ -3,6 +3,7 @@ package model
 import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
+	"Etpmls-Admin-Server/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -51,7 +52,7 @@ func (this *Attachment) AttachmentValidateImage(h *multipart.FileHeader) (s stri
 		return "bmp", nil
 	default:
 		err := errors.New("This is not an image file, or the image file format is not supported!")
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return "", err
 	}
 }
@@ -73,12 +74,12 @@ func (this *Attachment) AttachmentUploadImage(c *gin.Context, file *multipart.Fi
 	file_path := path + u + "." + extension
 	err = c.SaveUploadedFile(file, file_path)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return p, errors.New("Failed to save file!")
 	}
 
 	if err = database.DB.Create(&Attachment{Path: file_path}).Error; err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return p, err
 	}
 
@@ -92,14 +93,14 @@ func (this *Attachment) AttachmentValidatePath(path string) error {
 	const upload_path = "storage/upload/"
 	// 截取前十五个字符判断和Path是否相同
 	if len(path) <= len(upload_path) || !strings.Contains(path[:len(upload_path)], upload_path) {
-		core.LogError.Output(core.MessageWithLineNum("Illegal request path!"))
+		core.LogError.Output(utils.MessageWithLineNum("Illegal request path!"))
 		return  errors.New("Illegal request path!")
 	}
 	// 删除前缀
 	// p := strings.TrimPrefix(path, upload_path)
 	f, err := os.Stat(path)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		if os.IsNotExist(err) {
 			return nil
 		}
@@ -107,7 +108,7 @@ func (this *Attachment) AttachmentValidatePath(path string) error {
 	}
 	// 如果文件是目录
 	if f.IsDir() {
-		core.LogError.Output(core.MessageWithLineNum("Cannot delete directory!"))
+		core.LogError.Output(utils.MessageWithLineNum("Cannot delete directory!"))
 		return errors.New("Cannot delete directory!")
 	}
 	return nil
@@ -126,13 +127,13 @@ type ApiAttachmentDeleteImage struct {
 func (this *Attachment) AttachmentDeleteImage(j ApiAttachmentDeleteImage) (err error) {
 	err = os.Remove(j.Path)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return err
 	}
 
 	// Delete Database
 	if err = database.DB.Unscoped().Where("path = ?", j.Path).Delete(Attachment{}).Error; err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return err
 	}
 
@@ -155,7 +156,7 @@ func (this *Attachment) AttachmentBatchDelete(s []string) (err error) {
 
 	// Delete Database
 	if err = database.DB.Unscoped().Where("path IN (?)", s).Delete(Attachment{}).Error; err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return err
 	}
 
@@ -172,7 +173,7 @@ func (this *Attachment) DeleteUnused() error {
 	// If there is no value, return directly
 	// 如果没有值，则直接返回
 	if len(a) == 0 {
-		core.LogDebug.Output(core.MessageWithLineNum("No files need to be deleted!"))
+		core.LogDebug.Output(utils.MessageWithLineNum("No files need to be deleted!"))
 		return nil
 	}
 

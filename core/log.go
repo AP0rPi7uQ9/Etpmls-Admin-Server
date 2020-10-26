@@ -2,6 +2,7 @@ package core
 
 import (
 	"Etpmls-Admin-Server/library"
+	"Etpmls-Admin-Server/utils"
 	"fmt"
 	"strings"
 )
@@ -70,7 +71,7 @@ type OutputLog struct {
 func (o OutputLog) Output (info interface{}) {
 	l, err := ParseLogLevel(library.Config.Log.Level)
 	if err != nil {
-		library.Log.Panic(MessageWithLineNum("Error in the log function!"))
+		library.Log.Panic(utils.MessageWithLineNum("Error in the log function!"))
 		return
 	}
 
@@ -224,7 +225,7 @@ func (o OutputLog) Output (info interface{}) {
 func (o OutputLog) OutputDebug (err error, msg interface{}) {
 	l, err := ParseLogLevel(library.Config.Log.Level)
 	if err != nil {
-		library.Log.Panic(MessageWithLineNum("Error in the log function!"))
+		library.Log.Panic(utils.MessageWithLineNum("Error in the log function!"))
 		return
 	}
 
@@ -390,6 +391,6 @@ func (o OutputLog) AutoOutputDebug (msg interface{}, err error) {
 		return
 	}
 
-	o.OutputDebug(GenerateErrorWithMessage(v + "Error: ", err), msg)
+	o.OutputDebug(utils.GenerateErrorWithMessage(v + "Error: ", err), msg)
 	return
 }

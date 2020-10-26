@@ -66,7 +66,7 @@ var Config = configuration{}
 
 var Config_Module = make(map[string]map[interface{}]interface{})
 
-func init() {
+func init_Yaml() {
 	var yamlPath string
 
 	if os.Getenv("DEBUG") == "TRUE" {
@@ -77,13 +77,13 @@ func init() {
 
 	b, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
-		Library_Logrus.Fatal("Failed to read the configuration file! Error:", err)
+		Instance_Logrus.Fatal("Failed to read the configuration file! Error:", err)
 		return
 	}
 
 	err = yaml.Unmarshal(b, &Config)
 	if err != nil {
-		Library_Logrus.Fatal("Failed to unmarshal the configuration file! Error:", err)
+		Instance_Logrus.Fatal("Failed to unmarshal the configuration file! Error:", err)
 		return
 	}
 
@@ -92,13 +92,13 @@ func init() {
 
 		out, err := yaml.Marshal(Config)
 		if err != nil {
-			Library_Logrus.Fatal("配置文件解析成yaml格式失败！", err)
+			Instance_Logrus.Fatal("配置文件解析成yaml格式失败！", err)
 			return
 		}
 
 		err = ioutil.WriteFile(yamlPath, out, os.ModeAppend)
 		if err != nil {
-			Library_Logrus.Fatal("写入yaml配置文件失败！", err)
+			Instance_Logrus.Fatal("写入yaml配置文件失败！", err)
 			return
 		}
 	}

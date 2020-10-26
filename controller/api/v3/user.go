@@ -19,7 +19,7 @@ func UserRegister(c *gin.Context)  {
 		return
 	}
 
-	var j model.ApiUserRegister
+	var j model.Api_UserRegister
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -44,7 +44,7 @@ func UserRegister(c *gin.Context)  {
 
 	//Create User
 	var u model.User
-	id, err := u.UserRegister(j)
+	id, err := u.Register(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Register"), nil, err)
 		return
@@ -67,7 +67,7 @@ func UserLogin(c *gin.Context)  {
 		return
 	}
 
-	var j model.ApiUserLogin
+	var j model.Api_UserLogin
 
 	//Bind Data
 	if err := c.ShouldBindJSON(&j); err != nil {
@@ -83,7 +83,7 @@ func UserLogin(c *gin.Context)  {
 	}
 
 	var u model.User
-	id, username, err := u.UserLogin(j)
+	usr, err := u.Login(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Login"), nil, err)
 		return
@@ -91,7 +91,7 @@ func UserLogin(c *gin.Context)  {
 
 	//JWT
 	var us model.User
-	token, err := us.UserGetToken(id, username)
+	token, err := us.UserGetToken(usr.ID, usr.Username)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_GetToken"), nil, err)
 		return
@@ -122,7 +122,7 @@ func UserLoginWithoutCaptcha(c *gin.Context)  {
 	}
 
 	var u model.User
-	id, username, err := u.UserLoginWithoutCaptcha(j)
+	usr, err := u.UserLoginWithoutCaptcha(j)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_Login"), nil, err)
 		return
@@ -130,7 +130,7 @@ func UserLoginWithoutCaptcha(c *gin.Context)  {
 
 	//JWT
 	var us model.User
-	token, err := us.UserGetToken(id, username)
+	token, err := us.UserGetToken(usr.ID, usr.Username)
 	if err != nil {
 		core.JsonError(c, http.StatusBadRequest, core.ERROR_Code, core.Translate(c, "ERROR_MESSAGE_GetToken"), nil, err)
 		return

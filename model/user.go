@@ -4,9 +4,9 @@ import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
 	"Etpmls-Admin-Server/library"
+	"Etpmls-Admin-Server/utils"
 	"encoding/json"
 	"errors"
-	"github.com/dchest/captcha"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -28,10 +28,20 @@ type User struct {
 	Roles []Role `gorm:"many2many:role_users" json:"roles"`
 }
 
+type Api_UserGetOne struct {
+	ID        uint `json:"id"`
+	CreatedAt time.Time	`json:"created_at"`
+	UpdatedAt time.Time	`json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	Username string `json:"username"`
+	Password string `json:"-"`
+	Avatar Attachment	`gorm:"polymorphic:Owner;polymorphicValue:user-avatar" json:"avatar"`
+	Roles []Role `gorm:"many2many:role_users" json:"roles"`
+}
 
 // User register
 // 用户注册
-type ApiUserRegister struct {
+type Api_UserRegister struct {
 	ID        uint `json:"-"`
 	CreatedAt time.Time	`json:"-"`
 	UpdatedAt time.Time	`json:"-"`
@@ -40,20 +50,20 @@ type ApiUserRegister struct {
 	Password string `binding:"required" json:"password" validate:"max=255"`
 	Roles []Role `gorm:"many2many:role_users" json:"roles"`
 }
-func (this *User) UserRegister(j ApiUserRegister) (id uint, err error) {
-	type User ApiUserRegister
-	var form = User(j)
+func (this *User) Register(api Api_UserRegister) (id uint, err error) {
+	type User Api_UserRegister
+	var form = User(api)
 
 	// Password bcrypt
 	form.Password, err = this.UserBcryptPassword(form.Password)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return id, err
 	}
 
 	result := database.DB.Create(&form);
 	if result.Error != nil {
-		core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 		return id, result.Error
 	}
 
@@ -63,7 +73,7 @@ func (this *User) UserRegister(j ApiUserRegister) (id uint, err error) {
 
 // User login
 // 用户登录
-type ApiUserLogin struct{
+type Api_UserLogin struct{
 	ID        uint `json:"-"`
 	CreatedAt time.Time	`json:"-"`
 	UpdatedAt time.Time	`json:"-"`
@@ -73,16 +83,16 @@ type ApiUserLogin struct{
 	CaptchaId string `binding:"required" json:"captcha_id"`
 	Captcha string `binding:"required" json:"captcha"`
 }
-func (this *User) UserLogin(j ApiUserLogin) (id uint, username string, err error) {
+func (this *User) Login(api Api_UserLogin) (u User, err error) {
 	// Validate Captcha
-	if !captcha.VerifyString(j.CaptchaId, j.Captcha){
-		core.LogError.Output(core.MessageWithLineNum("验证码错误！"))
-		return id, username, errors.New("验证码错误！")
+	if !library.Captcha.Verify(api.CaptchaId, api.Captcha) {
+		core.LogError.Output(utils.MessageWithLineNum("验证码错误！"))
+		return u, errors.New("验证码错误！")
 	}
 
-	usrID, usrName, err := this.UserVerify(j.Username, j.Password)
+	usr, err := this.Verify(api.Username, api.Password)
 
-	return usrID, usrName, err
+	return usr, err
 }
 
 
@@ -96,10 +106,10 @@ type ApiUserLoginWithoutCaptcha struct{
 	Username string `binding:"required" json:"username" validate:"max=255"`
 	Password string `binding:"required" json:"password" validate:"max=255"`
 }
-func (this *User) UserLoginWithoutCaptcha(j ApiUserLoginWithoutCaptcha) (id uint, username string, err error) {
-	usrID, usrName, err := this.UserVerify(j.Username, j.Password)
+func (this *User) UserLoginWithoutCaptcha(j ApiUserLoginWithoutCaptcha) (u User, err error) {
+	usr, err := this.Verify(j.Username, j.Password)
 
-	return usrID, usrName, err
+	return usr, err
 }
 
 
@@ -155,20 +165,20 @@ func (this *User) UserCreate(c *gin.Context, j ApiUserCreate) (err error) {
 		// Bcrypt Password
 		form.Password, err = this.User_BcryptPasswordV2(j.Password)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return errors.New("密码加密失败！")
 		}
 
 		result := tx.Create(&form)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// User Create Event
-		u, err := this.User_InterfaceToUser(form)
+		u, err := this.InterfaceToUser(form)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -207,7 +217,7 @@ func (this *User) UserEdit(c *gin.Context, j ApiUserEdit) (err error) {
 	if len(j.Password) > 0 {
 		form.Password, err = this.User_BcryptPasswordV2(j.Password)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum("密码加密失败！"))
+			core.LogError.Output(utils.MessageWithLineNum("密码加密失败！"))
 			return errors.New("密码加密失败！")
 		}
 	}
@@ -218,20 +228,20 @@ func (this *User) UserEdit(c *gin.Context, j ApiUserEdit) (err error) {
 		// 删除关联
 		err = tx.Model(&User{ID:form.ID}).Association("Roles").Replace(j.Roles)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 		// 创建数据及关联
 		result := tx.Save(&form)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// User Edit Event for module
-		u, err := this.User_InterfaceToUser(form)
+		u, err := this.InterfaceToUser(form)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -271,14 +281,14 @@ func (this *User) UserDelete(c *gin.Context, ids []uint) (err error) {
 		// 删除用户
 		result := tx.Delete(&u)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// 删除关联
 		err = tx.Model(&u).Association("Roles").Clear()
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 
@@ -325,7 +335,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 			// 1.删除同名缓存
 			result := tx.Unscoped().Where("path = ?", j.Avatar.Path).Delete(Attachment{})
 			if result.Error != nil {
-				core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+				core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 				return result.Error
 			}
 		}
@@ -338,7 +348,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 			// 根据Path删除附件
 			err := old.AttachmentBatchDelete([]string{old.Path})
 			if err != nil {
-				core.LogError.Output(core.MessageWithLineNum(err.Error()))
+				core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 				return err
 			}
 		}
@@ -346,7 +356,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 		// 3.新增avatar
 		err := tx.Model(&User{ID: j.ID}).Association("Avatar").Replace(&Attachment{Path:j.Avatar.Path})
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 
@@ -359,7 +369,7 @@ func (this *User) UserUpdateInformation(j ApiUserUpdateInformation) error {
 
 		result := tx.Model(&User{ID: j.ID}).Updates(&j)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
@@ -387,7 +397,7 @@ func (this *User) UserBcryptPassword(password string) (string, error) {
 func (this *User) UserVerifyPassword(password, hash string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return false, err
 	}
 	return true, err
@@ -396,30 +406,30 @@ func (this *User) UserVerifyPassword(password, hash string) (bool, error) {
 
 // Verify user logic
 // 验证用户逻辑
-func (this *User) UserVerify(username string, password string) (id uint, unm string, err error) {
+func (this *User) Verify(username string, password string) (u User, err error) {
 	//Search User
 	var user User
 	database.DB.Where("username = ?", username).First(&user)
 	if !(user.ID > 0) {
-		core.LogError.Output(core.MessageWithLineNum("The username does not exist! Username:" + username))
-		return id, unm, errors.New("The username does not exist!")
+		core.LogError.Output(utils.MessageWithLineNum("The username does not exist! Username:" + username))
+		return u, errors.New("The username does not exist!")
 	}
 
 	//Password is wrong
 	b, err := this.UserVerifyPassword(password, user.Password)
 	if err != nil || !b {
-		core.LogError.Output(core.MessageWithLineNum("Verification failed or wrong password!"))
-		return id, unm, errors.New("Verification failed or wrong password!")
+		core.LogError.Output(utils.MessageWithLineNum("Verification failed or wrong password!"))
+		return u, errors.New("Verification failed or wrong password!")
 	}
 
-	return user.ID, user.Username, err
+	return user, err
 }
 
 
 // Get token by ID
 // 通过ID获取Token
 func (this *User) UserGetToken(userId uint, username string) (string, error) {
-	return library.Jwt_Token.CreateToken(&jwt.StandardClaims{
+	return library.JwtToken.CreateToken(&jwt.StandardClaims{
 		Id: strconv.Itoa(int(userId)),	// 用户ID
 		ExpiresAt: time.Now().Add(time.Second * library.Config.App.TokenExpirationTime).Unix(),	// 过期时间 - 12个小时
 		Issuer:    username,	// 发行者
@@ -463,13 +473,13 @@ func (this *User) user_GetCurrent_NotCache(c *gin.Context) (interface{}, error) 
 	var userApi ApiUserGetCurrent
 	b, err := json.Marshal(tmpUser)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return nil, err
 	}
 	// Get the filtered structure - ApiUserGetCurrentV3
 	err = json.Unmarshal(b, &userApi)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return nil, err
 	}
 
@@ -477,7 +487,7 @@ func (this *User) user_GetCurrent_NotCache(c *gin.Context) (interface{}, error) 
 	var a Attachment
 	err = database.DB.Model(&u).Association("Avatar").Find(&a)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return nil, err
 	}
 	userApi.Avatar = a.Path
@@ -513,14 +523,14 @@ func (this *User) user_GetCurrent_Cache(c *gin.Context) (interface{}, error) {
 		if err == redis.Nil {
 			return this.user_GetCurrent_NotCache(c)
 		}
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return nil, err
 	}
 
 	var userApi ApiUserGetCurrent
 	err = json.Unmarshal([]byte(str), &userApi)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		library.Cache.DeleteHash(core.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	}
 
@@ -538,22 +548,22 @@ func (this *User) User_BcryptPasswordV2(password string) (string, error) {
 // 根据token获取用户
 func (this *User) User_GetUserByToken(token string) (u User, err error) {
 	// 从Token获取ID
-	id, err := library.Jwt_Token.GetIdByToken(token)
+	id, err := library.JwtToken.GetIdByToken(token)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return u, err
 	}
 	// 从Token获取username
-	username, err  := library.Jwt_Token.GetIssuerByToken(token)
+	username, err  := library.JwtToken.GetIssuerByToken(token)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return u, err
 	}
 	// 获取用户
 	var data User
 	result := database.DB.Where("id = ? AND username = ?", id, username).First(&data)
 	if !(result.RowsAffected > 0) {
-		core.LogError.Output(core.MessageWithLineNum("The current user was not found in the database!"))
+		core.LogError.Output(utils.MessageWithLineNum("The current user was not found in the database!"))
 		return u, errors.New("The current user was not found in the database!")
 	}
 
@@ -592,9 +602,9 @@ func (this *User) User_GetUserIdByRequest(c *gin.Context) (id uint, err error) {
 // 根据token获取用户id
 func (this *User) User_GetUserIdByToken(token string) (id uint, err error) {
 	// 从Token获取ID
-	id, err = library.Jwt_Token.GetIdByToken(token)
+	id, err = library.JwtToken.GetIdByToken(token)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum(err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 		return 0, err
 	}
 
@@ -604,17 +614,34 @@ func (this *User) User_GetUserIdByToken(token string) (id uint, err error) {
 
 // interface conversion User
 // interface转换User
-func (this *User) User_InterfaceToUser(i interface{}) (User, error) {
+func (this *User) InterfaceToUser(i interface{}) (User, error) {
 	var u User
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:Object to JSON failed! err:" + err.Error())
+		core.LogError.Output(utils.MessageWithLineNum("Object to JSON failed! err:" + err.Error()))
 		return User{}, err
 	}
 	err = json.Unmarshal(us, &u)
 	if err != nil {
-		core.LogError.Output("User_InterfaceToUser:JSON conversion object failed! err:" + err.Error())
+		core.LogError.Output(utils.MessageWithLineNum("JSON conversion object failed! err:" + err.Error()))
 		return User{}, err
+	}
+	return u, nil
+}
+
+// interface conversion UserGetOne
+// interface转换UserGetOne
+func (this *User) InterfaceToUserGetOne(i interface{}) (Api_UserGetOne, error) {
+	var u Api_UserGetOne
+	us, err := json.Marshal(i)
+	if err != nil {
+		core.LogError.Output(utils.MessageWithLineNum("Object to JSON failed! err:" + err.Error()))
+		return Api_UserGetOne{}, err
+	}
+	err = json.Unmarshal(us, &u)
+	if err != nil {
+		core.LogError.Output(utils.MessageWithLineNum("JSON conversion object failed! err:" + err.Error()))
+		return Api_UserGetOne{}, err
 	}
 	return u, nil
 }

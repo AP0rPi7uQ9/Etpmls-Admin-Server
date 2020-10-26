@@ -8,14 +8,17 @@ import (
 	"strconv"
 )
 
-type JwtGo struct {
+type jwtGo struct {
 	MySigningKey []byte
 }
 
+func NewJwtToken(salt string) *jwtGo {
+	return &jwtGo{MySigningKey: []byte(salt)}
+}
 
 // Create Token
 // 创建令牌
-func (j *JwtGo)CreateToken(c interface{}) (t string, err error) {
+func (j *jwtGo)CreateToken(c interface{}) (t string, err error) {
 	claims, ok := c.(*jwt.StandardClaims)
 	if !ok {
 		return "", err
@@ -31,7 +34,7 @@ func (j *JwtGo)CreateToken(c interface{}) (t string, err error) {
 
 // Parse Token
 // 解析令牌
-func (j *JwtGo)ParseToken(tokenString string) (t interface{}, err error) {
+func (j *jwtGo)ParseToken(tokenString string) (t interface{}, err error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return j.MySigningKey, nil
 	})
@@ -59,7 +62,7 @@ func (j *JwtGo)ParseToken(tokenString string) (t interface{}, err error) {
 
 // Get Username
 // 获取用户名
-func (j *JwtGo)GetIssuerByToken(tokenString string) (issuer string, err error) {
+func (j *jwtGo)GetIssuerByToken(tokenString string) (issuer string, err error) {
 	tmp, err := j.ParseToken(tokenString)
 	if err != nil {
 		return "", err
@@ -85,7 +88,7 @@ func (j *JwtGo)GetIssuerByToken(tokenString string) (issuer string, err error) {
 
 // Get User ID
 // 获取用户ID
-func (j *JwtGo)GetIdByToken(tokenString string) (userId uint, err error) {
+func (j *jwtGo)GetIdByToken(tokenString string) (userId uint, err error) {
 	tmp, err := j.ParseToken(tokenString)
 	if err != nil {
 		return 0, err

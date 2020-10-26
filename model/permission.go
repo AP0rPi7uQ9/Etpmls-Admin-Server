@@ -3,6 +3,7 @@ package model
 import (
 	"Etpmls-Admin-Server/core"
 	"Etpmls-Admin-Server/database"
+	"Etpmls-Admin-Server/utils"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -42,14 +43,14 @@ func (this *Permission)PermissionCreate(c *gin.Context, j ApiPermissionCreate) (
 		// Insert Data
 		result := tx.Create(&form)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// Create Event for module
 		p, err := this.Permission_InterfaceToPermission(form)
 		if err != nil {
-			core.LogError.Output(core.MessageWithLineNum(err.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(err.Error()))
 			return err
 		}
 		select {
@@ -118,7 +119,7 @@ func (this *Permission) PermissionEdit(c *gin.Context, j ApiPermissionEdit) (err
 
 		result := tx.Save(&form)
 		if result.Error != nil {
-			core.LogError.Output(core.MessageWithLineNum(result.Error.Error()))
+			core.LogError.Output(utils.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
@@ -191,12 +192,12 @@ func (this *Permission) Permission_InterfaceToPermission(i interface{}) (Permiss
 	var p Permission
 	us, err := json.Marshal(i)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum("Object to JSON failed!" + err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum("Object to JSON failed!" + err.Error()))
 		return Permission{}, err
 	}
 	err = json.Unmarshal(us, &p)
 	if err != nil {
-		core.LogError.Output(core.MessageWithLineNum("JSON conversion object failed!" + err.Error()))
+		core.LogError.Output(utils.MessageWithLineNum("JSON conversion object failed!" + err.Error()))
 		return Permission{}, err
 	}
 	return p, nil
