@@ -3,7 +3,7 @@ package library
 import "time"
 
 var (
-	Jwt_Token = Interface_Jwt(&JwtGo{MySigningKey: []byte(Config.App.Key)})
+	Jwt_Token = Interface_Jwt(NewJwtGo())
 	I18n = Interface_I18n(&Go_i18n{})
 	Cache = Interface_Cache(&Redis{})
 	Log = Interface_Log(&Logrus{})

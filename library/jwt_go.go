@@ -12,6 +12,10 @@ type JwtGo struct {
 	MySigningKey []byte
 }
 
+func NewJwtGo() *JwtGo {
+	return &JwtGo{MySigningKey: []byte(Config.App.Key)}
+}
+
 
 // Create Token
 // 创建令牌
