@@ -17,6 +17,7 @@ type configuration struct {
 		Register bool
 		Key string
 		Cache bool
+		ServiceDiscovery	bool	`yaml:"service-discovery"`
 		TokenExpirationTime time.Duration	`yaml:"token-expiration-time"`
 		UseHttpCode bool	`yaml:"use-http-code"`
 		TimeZone string		`yaml:"time-zone"`

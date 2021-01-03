@@ -2,11 +2,20 @@ package route
 
 import (
 	"Etpmls-Admin-Server/controller/api/v3"
+	"Etpmls-Admin-Server/library"
 	"Etpmls-Admin-Server/middleware"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func RouteApi(r *gin.Engine)  {
+	if library.Config.App.ServiceDiscovery {
+		r.GET(library.Config.ServiceDiscovery.Service.CheckUrl, func(context *gin.Context) {
+			context.JSON(http.StatusOK, gin.H{
+				"Status": "Running",
+			})
+		})
+	}
 	r.GET("/api/v3/captcha/getOne", v3.CaptchaGetOne)
 	r.GET("/api/v3/captcha/getPicture/:captchaId", v3.CaptchaGetPicture)
 	r.POST("/api/v3/user/register", v3.UserRegister)

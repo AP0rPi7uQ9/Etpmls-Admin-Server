@@ -3,6 +3,7 @@ package library
 import (
 	"github.com/google/uuid"
 	Package_Consul "github.com/hashicorp/consul/api"
+	"strconv"
 )
 
 var (
@@ -11,6 +12,13 @@ var (
 )
 
 func init_Consul()  {
+	//	If the service discovery is not turned on, skip consul initialization
+	//	如果没有开启服务发现则跳过consul初始化
+	if !Config.App.Cache {
+		return
+	}
+
+
 	config := Package_Consul.DefaultConfig()
 	config.Address = Config.ServiceDiscovery.Address
 
@@ -52,7 +60,7 @@ func (this *consul) RegistrationService() error {
 
 	c := Package_Consul.AgentServiceCheck{
 		Interval:                       Config.ServiceDiscovery.Service.CheckInterval,
-		HTTP:                           Config.ServiceDiscovery.Service.CheckUrl,
+		HTTP:                           "http://" + Config.ServiceDiscovery.Service.Address + ":" + strconv.Itoa(Config.ServiceDiscovery.Service.Port) + Config.ServiceDiscovery.Service.CheckUrl,
 	}
 
 	r.Check = &c

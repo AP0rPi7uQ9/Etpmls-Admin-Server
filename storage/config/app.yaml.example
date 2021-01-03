@@ -14,6 +14,7 @@ app:
   # [Required] Whether to enable the cache function, if you have installed redis, please fill in true, otherwise fill in false, The default is false
   # [必填] 是否开启缓存功能，如果你安装了redis等，请填写true，否则填写false，默认为false
   cache: false
+  service-discovery: true
   # token expiration time(second), The default is 86400
   # token过期时间(秒)，默认为86400
   token-expiration-time: 86400
@@ -75,7 +76,7 @@ service-discovery:
     port: 8080
     tag: ["primary"]
     check-interval: "5s"
-    check-url: "http://127.0.0.1/health"
+    check-url: "/health"
 field:
   api:
     # [Required] The following are the custom field names returned by the API, which can be customized to adapt to different front-end frameworks (eg: msg)
